@@ -1,0 +1,23 @@
+sistema-gestao/
+├── .env
+├── .git/
+├── .gitignore
+├── README.md
+├── database.sql
+├── manage.py
+├── db.sqlite3
+├── venv/
+├── app/                   ← Config Django (settings, urls, wsgi, asgi)
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── urls.py
+│   ├── wsgi.py
+│   └── asgi.py
+└── gestao/                ← App Django na raiz
+    ├── __init__.py
+    ├── admin.py
+    ├── apps.py
+    ├── models.py
+    ├── views.py
+    ├── tests.py
+    └── migrations/
