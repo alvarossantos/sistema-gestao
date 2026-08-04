@@ -2,6 +2,7 @@ from django.db import models
 
 
 class Usuario(models.Model):
+    id = models.AutoField(primary_key=True)
     username = models.CharField(unique=True, max_length=150)
     email = models.CharField(unique=True, max_length=255)
     password_hash = models.CharField(max_length=128)
@@ -22,3 +23,13 @@ class Usuario(models.Model):
 
     def __str__(self):
         return f"{str(self.primeiro_nome)} {str(self.ultimo_nome)}"
+
+    @property
+    def is_authenticated(self):
+        """Necessário para o Django reconhecer como usuário autenticado."""
+        return True
+
+    @property
+    def is_active(self):
+        """Mapeia o campo 'ativo' para o padrão do Django."""
+        return self.ativo
