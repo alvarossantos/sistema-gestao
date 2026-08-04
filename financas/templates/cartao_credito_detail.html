@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ cartao_credito.nome }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4>{{ cartao_credito.nome }}</h4>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Nome:</strong>
+                        <span>{{ cartao_credito.nome }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Limite:</strong>
+                        <span>R$ {{ cartao_credito.limite }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Dia de Fechamento:</strong>
+                        <span>Dia {{ cartao_credito.dia_fechamento }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Dia de Vencimento:</strong>
+                        <span>Dia {{ cartao_credito.dia_vencimento }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Conta de Pagamento:</strong>
+                        <span>{{ cartao_credito.conta_pagamento }}</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-footer d-flex gap-2">
+                <a href="{% url 'financas:editarcartao' cartao_credito.pk %}" class="btn btn-warning">Editar</a>
+                <a href="{% url 'financas:listarcartao' %}" class="btn btn-secondary">Voltar</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
