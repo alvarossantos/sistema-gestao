@@ -50,7 +50,7 @@ class Categoria(models.Model):
     usuario = models.ForeignKey('usuarios.Usuario', models.CASCADE)
     nome = models.CharField(max_length=100)
     tipo = models.CharField(max_length=10, choices=TIPO_CHOICES)
-    categoria_pai = models.ForeignKey('self', models.CASCADE, blank=True, null=True)
+    categoria_pai = models.ForeignKey('self', models.SET_NULL, blank=True, null=True)
     cor = models.CharField(max_length=7)
     ativa = models.BooleanField()
 

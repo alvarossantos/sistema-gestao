@@ -11,7 +11,7 @@ class Usuario(models.Model):
     foto = models.TextField(blank=True, null=True)
     is_superuser = models.BooleanField()
     is_staff = models.BooleanField()
-    ultimo_login = models.DateTimeField(blank=True, null=True)
+    last_login = models.DateTimeField(blank=True, null=True, db_column='ultimo_login')
     ativo = models.BooleanField()
     criado_em = models.DateTimeField(blank=True, null=True)
     atualizado_em = models.DateTimeField(blank=True, null=True)
