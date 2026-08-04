@@ -28,6 +28,10 @@
                         <strong>Criado em:</strong>
                         <span>{{ conta.criado_em|default:"-" }}</span>
                     </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Ativa:</strong>
+                        <span>{{ conta.ativa|yesno:"Sim,Não" }}</span>
+                    </li>
                 </ul>
             </div>
             <div class="card-footer d-flex gap-2">

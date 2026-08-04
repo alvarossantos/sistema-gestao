@@ -34,6 +34,7 @@
             </div>
             <div class="card-footer d-flex gap-2">
                 <a href="{% url 'financas:editarcentrocusto' centrocusto.pk %}" class="btn btn-warning">Editar</a>
+                <a href="{% url 'financas:desativarcentrocusto' centrocusto.pk %}" class="btn btn-danger">Desativar</a>
                 <a href="{% url 'financas:listarcentrocustos' %}" class="btn btn-secondary">Voltar</a>
             </div>
         </div>

@@ -49,6 +49,7 @@
             </div>
             <div class="card-footer d-flex gap-2">
                 <a href="{% url 'financas:editarcategoria' categoria.pk %}" class="btn btn-warning">Editar</a>
+                <a href="{% url 'financas:desativarcategoria' categoria.pk %}" class="btn btn-danger">Desativar</a>
                 <a href="{% url 'financas:listarcategorias' %}" class="btn btn-secondary">Voltar</a>
             </div>
         </div>

@@ -36,6 +36,7 @@
                 <td>
                     <a href="{% url 'financas:detalhe' conta.pk %}" class="btn btn-sm btn-outline-primary">Ver</a>
                     <a href="{% url 'financas:editar' conta.pk %}" class="btn btn-sm btn-outline-warning">Editar</a>
+                    <a href="{% url 'financas:desativar' conta.pk %}" class="btn btn-sm btn-outline-danger">Desativar</a>
                 </td>
             </tr>
             {% endfor %}

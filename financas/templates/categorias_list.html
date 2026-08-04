@@ -44,6 +44,7 @@
                 <td>
                     <a href="{% url 'financas:detalhecategoria' cat.pk %}" class="btn btn-sm btn-outline-primary">Ver</a>
                     <a href="{% url 'financas:editarcategoria' cat.pk %}" class="btn btn-sm btn-outline-warning">Editar</a>
+                    <a href="{% url 'financas:desativarcategoria' cat.pk %}" class="btn btn-sm btn-outline-danger">Desativar</a>
                 </td>
             </tr>
             {% endfor %}

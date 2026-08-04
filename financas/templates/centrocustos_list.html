@@ -32,6 +32,7 @@
                 <td>
                     <a href="{% url 'financas:detalhecentrocusto' cc.pk %}" class="btn btn-sm btn-outline-primary">Ver</a>
                     <a href="{% url 'financas:editarcentrocusto' cc.pk %}" class="btn btn-sm btn-outline-warning">Editar</a>
+                    <a href="{% url 'financas:desativarcentrocusto' cc.pk %}" class="btn btn-sm btn-outline-danger">Desativar</a>
                 </td>
             </tr>
             {% endfor %}
