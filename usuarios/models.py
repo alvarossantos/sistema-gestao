@@ -8,7 +8,7 @@ class Usuario(models.Model):
     password_hash = models.CharField(max_length=128)
     primeiro_nome = models.CharField(max_length=150)
     ultimo_nome = models.CharField(max_length=150)
-    foto = models.TextField(blank=True, null=True)
+    foto = models.ImageField(upload_to="fotos/", blank=True, null=True)
     is_superuser = models.BooleanField()
     is_staff = models.BooleanField()
     last_login = models.DateTimeField(blank=True, null=True, db_column='ultimo_login')

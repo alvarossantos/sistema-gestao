@@ -5,30 +5,35 @@ from . import views
 app_name = "financas"
 
 urlpatterns = [
-    path("listarcontas/", views.FinancasContaListView.as_view(), name="listarcontas"),
-    path("listarcontas/nova/", views.FinancasContaCreateView.as_view(), name="nova"),
-    path("listarcontas/<int:pk>/", views.FinancasContaDetailView.as_view(), name="detalhe"),
-    path("listarcontas/<int:pk>/editar/", views.FinancasContaUpdateView.as_view(), name="editar"),
-    path("listarcontas/<int:pk>/desativar/", views.FinancasDesativarContaView.as_view(), name="desativar"),
+    # Contas
+    path("listarcontas/", views.FinancasContaListView.as_view(), name="conta-listar"),
+    path("listarcontas/nova/", views.FinancasContaCreateView.as_view(), name="conta-nova"),
+    path("listarcontas/<int:pk>/", views.FinancasContaDetailView.as_view(), name="conta-detalhe"),
+    path("listarcontas/<int:pk>/editar/", views.FinancasContaUpdateView.as_view(), name="conta-editar"),
+    path("listarcontas/<int:pk>/desativar/", views.FinancasDesativarContaView.as_view(), name="conta-desativar"),
 
-    path("listarcategorias/", views.FinancasCategoriaListView.as_view(), name="listarcategorias"),
-    path("listarcategorias/nova/", views.FinancasCategoriaCreateView.as_view(), name="novacategoria"),
-    path("listarcategorias/<int:pk>/", views.FinancasCategoriaDetailView.as_view(), name="detalhecategoria"),
-    path("listarcategorias/<int:pk>/editar/", views.FinancasCategoriaUpdateView.as_view(), name="editarcategoria"),
-    path("listarcategorias/<int:pk>/desativar/", views.FinancasDesativarCategoriaView.as_view(), name="desativarcategoria"),
+    # Categorias
+    path("listarcategorias/", views.FinancasCategoriaListView.as_view(), name="categoria-listar"),
+    path("listarcategorias/nova/", views.FinancasCategoriaCreateView.as_view(), name="categoria-nova"),
+    path("listarcategorias/<int:pk>/", views.FinancasCategoriaDetailView.as_view(), name="categoria-detalhe"),
+    path("listarcategorias/<int:pk>/editar/", views.FinancasCategoriaUpdateView.as_view(), name="categoria-editar"),
+    path("listarcategorias/<int:pk>/desativar/", views.FinancasDesativarCategoriaView.as_view(), name="categoria-desativar"),
 
-    path("listarcentrocustos/", views.FinancasCentroCustoListView.as_view(), name="listarcentrocustos"),
-    path("listarcentrocustos/nova/", views.FinancasCentroCustoCreateView.as_view(), name="novacentrocusto"),
-    path("listarcentrocustos/<int:pk>/", views.FinancasCentroCustoDetailView.as_view(), name="detalhecentrocusto"),
-    path("listarcentrocustos/<int:pk>/editar/", views.FinancasCentroCustoUpdateView.as_view(), name="editarcentrocusto"),
-    path("listarcentrocustos/<int:pk>/desativar/", views.FinancasDesativarCentroCustoView.as_view(), name="desativarcentrocusto"),
+    # Centros de Custo
+    path("listarcentrocustos/", views.FinancasCentroCustoListView.as_view(), name="centrocusto-listar"),
+    path("listarcentrocustos/nova/", views.FinancasCentroCustoCreateView.as_view(), name="centrocusto-nova"),
+    path("listarcentrocustos/<int:pk>/", views.FinancasCentroCustoDetailView.as_view(), name="centrocusto-detalhe"),
+    path("listarcentrocustos/<int:pk>/editar/", views.FinancasCentroCustoUpdateView.as_view(), name="centrocusto-editar"),
+    path("listarcentrocustos/<int:pk>/desativar/", views.FinancasDesativarCentroCustoView.as_view(), name="centrocusto-desativar"),
 
-    path("cartao/", views.FinancasCartaoCreditoListView.as_view(), name="listarcartao"),
-    path("cartao/nova/", views.FinancasCartaoCreditoCreateView.as_view(), name="novacartao"),
-    path("cartao/<int:pk>/", views.FinancasCartaoCreditoDetailView.as_view(), name="detalhecartao"),
-    path("cartao/<int:pk>/editar/", views.FinancasCartaoCreditoUpdateView.as_view(), name="editarcartao"),
+    # Cartões de Crédito
+    path("cartao/", views.FinancasCartaoCreditoListView.as_view(), name="cartao-listar"),
+    path("cartao/nova/", views.FinancasCartaoCreditoCreateView.as_view(), name="cartao-nova"),
+    path("cartao/<int:pk>/", views.FinancasCartaoCreditoDetailView.as_view(), name="cartao-detalhe"),
+    path("cartao/<int:pk>/editar/", views.FinancasCartaoCreditoUpdateView.as_view(), name="cartao-editar"),
 
-    path("forma/", views.FinancasFormaPagamentoListView.as_view(), name="listarforma"),
-    path("forma/nova/", views.FinancasFormaPagamentoCreateView.as_view(), name="novaforma"),
-    path("forma/<int:pk>/editar/", views.FinancasFormaPagamentoUpdateView.as_view(), name="editarforma"),
+    # Formas de Pagamento
+    path("forma/", views.FinancasFormaPagamentoListView.as_view(), name="forma-listar"),
+    path("forma/nova/", views.FinancasFormaPagamentoCreateView.as_view(), name="forma-nova"),
+    path("forma/<int:pk>/editar/", views.FinancasFormaPagamentoUpdateView.as_view(), name="forma-editar"),
 ]

@@ -17,8 +17,8 @@ class Movimentacao(models.Model):
     usuario = models.ForeignKey('usuarios.Usuario', on_delete=models.CASCADE)
     conta = models.ForeignKey('financas.Conta', on_delete=models.PROTECT)
     categoria = models.ForeignKey('financas.Categoria', on_delete=models.PROTECT)
-    forma_pagamento = models.ForeignKey('financas.FormaPagamento', on_delete=models.SET_NULL, blank=True, null=True)
-    centro_custo = models.ForeignKey('financas.CentroCusto', on_delete=models.SET_NULL, blank=True, null=True)
+    forma_pagamento = models.ForeignKey('financas.FormaPagamento', on_delete=models.SET_NULL, blank=True, null=True, db_column='formas_pagamento_id')
+    centro_custo = models.ForeignKey('financas.CentroCusto', on_delete=models.SET_NULL, blank=True, null=True, db_column='centros_custo_id')
     cartao = models.ForeignKey('financas.CartaoCredito', on_delete=models.SET_NULL, blank=True, null=True)
 
     descricao = models.CharField(max_length=255)
@@ -65,7 +65,7 @@ class Transferencia(models.Model):
 
 class AnexoMovimentacao(models.Model):
     movimentacao = models.ForeignKey(Movimentacao, on_delete=models.CASCADE)
-    arquivo = models.CharField(max_length=255)
+    arquivo = models.FileField(upload_to="anexos/")
     enviado_em = models.DateTimeField(auto_now_add=True)
 
     class Meta:

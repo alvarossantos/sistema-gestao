@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Meu Perfil{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4>Meu Perfil</h4>
+                <a href="{% url 'usuarios:usuario-perfil-atualizar' %}" class="btn btn-sm btn-primary">Editar</a>
+            </div>
+            <div class="card-body">
+                {% if usuario.foto %}
+                <div class="text-center mb-3">
+                    <img src="{{ usuario.foto.url }}" alt="Foto de perfil" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
+                </div>
+                {% endif %}
+                <table class="table">
+                    <tr>
+                        <th>Usuário:</th>
+                        <td>{{ usuario.username }}</td>
+                    </tr>
+                    <tr>
+                        <th>Nome:</th>
+                        <td>{{ usuario.primeiro_nome }} {{ usuario.ultimo_nome }}</td>
+                    </tr>
+                    <tr>
+                        <th>Email:</th>
+                        <td>{{ usuario.email }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

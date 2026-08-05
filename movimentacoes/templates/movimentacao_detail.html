@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ movimentacao.descricao }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4>{{ movimentacao.descricao }}</h4>
+                {% if movimentacao.tipo == 'RECEITA' %}
+                    <span class="badge bg-success">Receita</span>
+                {% else %}
+                    <span class="badge bg-danger">Despesa</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Valor:</strong>
+                        <span>R$ {{ movimentacao.valor }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Status:</strong>
+                        <span>
+                            {% if movimentacao.status == 'PAGO' %}
+                                <span class="badge bg-success">Pago</span>
+                            {% elif movimentacao.status == 'PENDENTE' %}
+                                <span class="badge bg-warning text-dark">Pendente</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Cancelado</span>
+                            {% endif %}
+                        </span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Conta:</strong>
+                        <span>{{ movimentacao.conta }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Categoria:</strong>
+                        <span>{{ movimentacao.categoria }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Forma de Pagamento:</strong>
+                        <span>{{ movimentacao.forma_pagamento|default:"-" }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Centro de Custo:</strong>
+                        <span>{{ movimentacao.centro_custo|default:"-" }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Cartão:</strong>
+                        <span>{{ movimentacao.cartao|default:"-" }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Data de Movimentação:</strong>
+                        <span>{{ movimentacao.data_movimentacao|date:"d/m/Y" }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Data de Vencimento:</strong>
+                        <span>{{ movimentacao.data_vencimento|date:"d/m/Y" }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Data de Pagamento:</strong>
+                        <span>{{ movimentacao.data_pagamento|date:"d/m/Y"|default:"-" }}</span>
+                    </li>
+                    {% if movimentacao.numero_parcela %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Parcela:</strong>
+                        <span>{{ movimentacao.numero_parcela }}/{{ movimentacao.total_parcelas }}</span>
+                    </li>
+                    {% endif %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Observação:</strong>
+                        <span>{{ movimentacao.observacao|default:"-" }}</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-footer d-flex gap-2">
+                <a href="{% url 'movimentacoes:movimentacao-editar' movimentacao.pk %}" class="btn btn-warning">Editar</a>
+                <a href="{% url 'movimentacoes:movimentacao-excluir' movimentacao.pk %}" class="btn btn-danger">Excluir</a>
+                <a href="{% url 'movimentacoes:listarmovimentacao' %}" class="btn btn-secondary">Voltar</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

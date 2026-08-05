@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Formas de Pagamento{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Formas de Pagamento</h2>
+    <a href="{% url 'financas:forma-nova' %}" class="btn btn-primary">+ Nova Forma de Pagamento</a>
+</div>
+
+{% if forma_pagamento %}
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Nome</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for fp in forma_pagamento %}
+            <tr>
+                <td>{{ fp.nome }}</td>
+                <td>
+                    <a href="{% url 'financas:forma-editar' fp.pk %}" class="btn btn-sm btn-outline-warning">Editar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-info">
+    Nenhuma forma de pagamento cadastrada. <a href="{% url 'financas:forma-nova' %}">Crie a primeira!</a>
+</div>
+{% endif %}
+{% endblock %}

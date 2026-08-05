@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Transferências{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Transferências</h2>
+    <div class="d-flex gap-2">
+        <a href="{% url 'movimentacoes:listarmovimentacao' %}" class="btn btn-outline-secondary">Movimentações</a>
+        <a href="{% url 'movimentacoes:transferencia-nova' %}" class="btn btn-primary">+ Nova Transferência</a>
+    </div>
+</div>
+
+{% if transferencias %}
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Conta Origem</th>
+                <th>Conta Destino</th>
+                <th>Valor</th>
+                <th>Data</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transf in transferencias %}
+            <tr>
+                <td>{{ transf.conta_origem }}</td>
+                <td>{{ transf.conta_destino }}</td>
+                <td>R$ {{ transf.valor }}</td>
+                <td>{{ transf.data|date:"d/m/Y" }}</td>
+                <td>
+                    <a href="{% url 'movimentacoes:transferencia-detalhe' transf.pk %}" class="btn btn-sm btn-outline-primary">Ver</a>
+                    <a href="{% url 'movimentacoes:transferencia-editar' transf.pk %}" class="btn btn-sm btn-outline-warning">Editar</a>
+                    <a href="{% url 'movimentacoes:transferencia-excluir' transf.pk %}" class="btn btn-sm btn-outline-danger">Excluir</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-info">
+    Nenhuma transferência cadastrada. <a href="{% url 'movimentacoes:transferencia-nova' %}">Faça a primeira!</a>
+</div>
+{% endif %}
+{% endblock %}

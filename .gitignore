@@ -10,6 +10,9 @@ __pycache__/
 # Banco de dados
 db.sqlite3
 
+# Arquivos de mídia enviados pelos usuários (anexos, fotos)
+media/
+
 # IDE
 .vscode/
 .idea/

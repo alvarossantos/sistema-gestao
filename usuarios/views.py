@@ -12,10 +12,10 @@ def cadastro_view(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Cadastro realizado com sucesso!")
-            return redirect("usuarios:login")
+            return redirect("usuarios:usuario-login")
     else:
         form = forms.CadastroForm()
-    return render(request, "cadastro.html", {"form": form})
+    return render(request, "usuario_cadastro.html", {"form": form})
 
 
 def login_view(request):
@@ -25,20 +25,20 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect("financas:listarcontas")
+            return redirect("financas:conta-listar")
         messages.error(request, "Usuário ou senha inválidos.")
-    return render(request, "login.html")
+    return render(request, "usuario_login.html")
 
 
 @login_required
 def logout_view(request):
     logout(request)
-    return redirect("usuarios:login")
+    return redirect("usuarios:usuario-login")
 
 
 @login_required
 def perfil_view(request):
-    return render(request, "perfil.html", {"usuario": request.user})
+    return render(request, "usuario_perfil.html", {"usuario": request.user})
 
 
 @login_required
@@ -49,7 +49,7 @@ def perfil_atualizar_view(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Perfil atualizado com sucesso!")
-            return redirect("usuarios:perfil")
+            return redirect("usuarios:usuario-perfil")
     else:
         form = forms.PerfilForm(instance=usuario)
-    return render(request, "perfil_atualizar.html", {"form": form})
+    return render(request, "usuario_perfil_update.html", {"form": form})

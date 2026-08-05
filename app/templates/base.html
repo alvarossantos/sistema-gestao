@@ -10,16 +10,19 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'usuarios:perfil' %}">Sistema Gestão</a>
+                <a class="navbar-brand" href="{% url 'usuarios:usuario-perfil' %}">Sistema Gestão</a>
             {% if user.is_authenticated %}
             <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="{% url 'financas:listarcontas' %}">Contas</a>
-                <a class="nav-link" href="{% url 'financas:listarcategorias' %}">Categorias</a>
-                <a class="nav-link" href="{% url 'financas:listarcentrocustos' %}">Centros de Custo</a>
-                <a class="nav-link" href="{% url 'financas:listarcartao' %}">Cartões</a>
-                <a class="nav-link" href="{% url 'financas:listarforma' %}">Formas Pgto</a>
-                <a class="nav-link" href="{% url 'usuarios:perfil' %}">Perfil</a>
-                <a class="nav-link" href="{% url 'usuarios:logout' %}">Sair</a>
+                <a class="nav-link" href="{% url 'financas:conta-listar' %}">Contas</a>
+                <a class="nav-link" href="{% url 'financas:categoria-listar' %}">Categorias</a>
+                <a class="nav-link" href="{% url 'financas:centrocusto-listar' %}">Centros de Custo</a>
+                <a class="nav-link" href="{% url 'financas:cartao-listar' %}">Cartões</a>
+                <a class="nav-link" href="{% url 'financas:forma-listar' %}">Formas Pgto</a>
+                <a class="nav-link" href="{% url 'movimentacoes:listarmovimentacao' %}">Movimentações</a>
+                <a class="nav-link" href="{% url 'movimentacoes:listartransferencia' %}">Transferências</a>
+                <a class="nav-link" href="{% url 'movimentacoes:listaranexo' %}">Anexos</a>
+                <a class="nav-link" href="{% url 'usuarios:usuario-perfil' %}">Perfil</a>
+                <a class="nav-link" href="{% url 'usuarios:usuario-logout' %}">Sair</a>
             </div>
             {% endif %}
         </div>

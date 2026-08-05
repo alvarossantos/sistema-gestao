@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Anexo{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4>Detalhes do Anexo</h4>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Movimentação:</strong>
+                        <span>{{ anexo.movimentacao }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Arquivo:</strong>
+                        <span>{{ anexo.arquivo.name }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Enviado em:</strong>
+                        <span>{{ anexo.enviado_em|date:"d/m/Y H:i" }}</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-footer d-flex gap-2">
+                <a href="{{ anexo.arquivo.url }}" class="btn btn-primary" target="_blank">Download</a>
+                <a href="{% url 'movimentacoes:listaranexo' %}" class="btn btn-secondary">Voltar</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

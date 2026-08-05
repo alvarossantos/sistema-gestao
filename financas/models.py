@@ -16,7 +16,7 @@ class Conta(models.Model):
     nome = models.CharField(max_length=100)
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
     saldo_inicial = models.DecimalField(max_digits=12, decimal_places=2)
-    ativa = models.BooleanField()
+    ativa = models.BooleanField(default=True)
     criado_em = models.DateTimeField(blank=True, null=True)
 
     class Meta:
@@ -52,7 +52,7 @@ class Categoria(models.Model):
     tipo = models.CharField(max_length=10, choices=TIPO_CHOICES)
     categoria_pai = models.ForeignKey('self', models.SET_NULL, blank=True, null=True)
     cor = models.CharField(max_length=7)
-    ativa = models.BooleanField()
+    ativa = models.BooleanField(default=True)
 
     class Meta:
         managed = False
@@ -64,7 +64,7 @@ class Categoria(models.Model):
 class CentroCusto(models.Model):
     usuario = models.ForeignKey('usuarios.Usuario', models.CASCADE)
     nome = models.CharField(max_length=100)
-    ativo = models.BooleanField()
+    ativo = models.BooleanField(default=True)
 
     class Meta:
         managed = False
