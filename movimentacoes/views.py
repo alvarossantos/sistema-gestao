@@ -1,11 +1,20 @@
+import calendar
+import uuid
+from typing import cast
+
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, redirect
 from django.urls.base import reverse_lazy
+from django.utils import timezone
 from django.views.generic import (
     CreateView,
     DeleteView,
     DetailView,
     ListView,
     UpdateView,
+    View,
 )
 
 from . import forms
@@ -21,6 +30,17 @@ class MovimentacaoListView(LoginRequiredMixin, ListView):
         return super().get_queryset().filter(usuario=self.request.user)
 
 
+def _somar_meses(data, meses):
+    """
+    dia 31/jan + 1 mês -> 28/29 de fev, sem estourar erro de data inválida
+    """
+    mes_index = data.month - 1 + meses
+    ano = data.year + mes_index // 12
+    mes = mes_index % 12 + 1
+    dia = min(data.day, calendar.monthrange(ano, mes)[1])
+    return data.replace(year=ano, month=mes, day=dia)
+
+
 class MovimentacaoCreateView(LoginRequiredMixin, CreateView):
     model = Movimentacao
     template_name = "movimentacao_create.html"
@@ -34,7 +54,47 @@ class MovimentacaoCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.usuario = self.request.user
-        return super().form_valid(form)
+
+        total_parcelas = form.cleaned_data.get("total_parcelas")
+
+        if total_parcelas and total_parcelas > 1:
+            form.instance.grupo_parcela = uuid.uuid4()
+            form.instance.numero_parcela = 1
+
+            # salva a 1ª parcela em self.object
+            response = super().form_valid(form)
+            primeira = form.instance
+
+            novas = [
+                Movimentacao(
+                    usuario=primeira.usuario,
+                    conta=primeira.conta,
+                    categoria=primeira.categoria,
+                    forma_pagamento=primeira.forma_pagamento,
+                    centro_custo=primeira.centro_custo,
+                    cartao=primeira.cartao,
+                    descricao=primeira.descricao,
+                    valor=primeira.valor,
+                    tipo=primeira.tipo,
+                    status="PENDENTE",
+                    data_movimentacao=primeira.data_movimentacao,
+                    data_vencimento=_somar_meses(primeira.data_vencimento, n - 1),
+                    grupo_parcela=primeira.grupo_parcela,
+                    numero_parcela=n,
+                    total_parcelas=total_parcelas,
+                    observacao=primeira.observacao,
+                )
+                for n in range(2, total_parcelas + 1)
+            ]
+            Movimentacao.objects.bulk_create(novas)
+            messages.success(
+                self.request, f"Lançamento parcelado em {total_parcelas} parcelas."
+            )
+            return response
+
+        response = super().form_valid(form)
+        messages.success(self.request, "Movimentação criado com sucesso.")
+        return response
 
 
 class MovimentacaoUpdateView(LoginRequiredMixin, UpdateView):
@@ -73,6 +133,21 @@ class MovimentacaoDetailView(LoginRequiredMixin, DetailView):
 
     def get_queryset(self):
         return super().get_queryset().filter(usuario=self.request.user)
+
+
+class MovimentacaoPagarView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        movimentacao = get_object_or_404(
+            Movimentacao, pk=kwargs["pk"], usuario=request.user
+        )
+        movimentacao.status = "PAGO"
+        movimentacao.data_pagamento = timezone.localdate()
+        movimentacao.save(update_fields=["status", "data_pagamento"])
+        messages.success(request, f"'{movimentacao.descricao}' marcado como paga.")
+        return redirect(
+            request.META.get("HTTP_REFERER")
+            or reverse_lazy("movimentacoes:listarmovimentacao")
+        )
 
 
 class TransferenciaListView(LoginRequiredMixin, ListView):
@@ -164,3 +239,34 @@ class AnexoMovimentacaoDetailView(LoginRequiredMixin, DetailView):
 
     def get_queryset(self):
         return super().get_queryset().filter(movimentacao__usuario=self.request.user)
+
+
+class AnexoMovimentacaoUpdateView(LoginRequiredMixin, UpdateView):
+    model = AnexoMovimentacao
+    template_name = "anexo_update.html"
+    form_class = forms.AnexoMovimentacaoForm
+    success_url = reverse_lazy("movimentacoes:listaranexo")
+
+    def get_queryset(self):
+        return super().get_queryset().filter(movimentacao__usuario=self.request.user)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
+
+class AnexoMovimentacaoDeleteView(LoginRequiredMixin, DeleteView):
+    model = AnexoMovimentacao
+    template_name = "anexo__confirm_delete.html"
+    context_object_name = "anexo"
+    success_url = reverse_lazy("movimentacoes:listaranexo")
+
+    def get_queryset(self):
+        return super().get_queryset().filter(movimentacao__usuario=self.request.user)
+
+    def form_valid(self, form):
+        self.object = cast(AnexoMovimentacao, self.get_object())
+        self.object.arquivo.delete(save=False)
+        self.object.delete()
+        return HttpResponseRedirect(self.get_success_url())
