@@ -1,4 +1,3 @@
-import calendar
 import uuid
 from typing import cast
 
@@ -17,6 +16,8 @@ from django.views.generic import (
     View,
 )
 
+from core.utils import _somar_meses
+
 from . import forms
 from .models import AnexoMovimentacao, Movimentacao, Transferencia
 
@@ -28,17 +29,6 @@ class MovimentacaoListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return super().get_queryset().filter(usuario=self.request.user)
-
-
-def _somar_meses(data, meses):
-    """
-    dia 31/jan + 1 mês -> 28/29 de fev, sem estourar erro de data inválida
-    """
-    mes_index = data.month - 1 + meses
-    ano = data.year + mes_index // 12
-    mes = mes_index % 12 + 1
-    dia = min(data.day, calendar.monthrange(ano, mes)[1])
-    return data.replace(year=ano, month=mes, day=dia)
 
 
 class MovimentacaoCreateView(LoginRequiredMixin, CreateView):

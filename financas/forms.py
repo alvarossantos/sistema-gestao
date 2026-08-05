@@ -56,6 +56,15 @@ class CartaoCreditoForm(forms.ModelForm):
             field = cast(forms.ModelChoiceField, self.fields["conta_pagamento"])
             field.queryset = models.Conta.objects.filter(usuario=user)
 
+    def clean(self):
+        cleaned_data = super().clean()
+        for campo in ("dia_fechamento", "dia_vencimento"):
+            valor = cleaned_data.get(campo)
+            if valor is not None and not (1 <= valor <= 31):
+                self.add_error(campo, "Informe um dia entre 1 e 31.")
+
+        return cleaned_data
+
 
 class CategoriaForm(forms.ModelForm):
     class Meta:

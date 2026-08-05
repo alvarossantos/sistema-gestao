@@ -29,7 +29,7 @@ class MovimentacaoForm(forms.ModelForm):
             "data_pagamento",
             "numero_parcela",
             "total_parcelas",
-            "observacao"
+            "observacao",
         ]
 
         widgets = {
@@ -39,7 +39,9 @@ class MovimentacaoForm(forms.ModelForm):
             "centro_custo": forms.Select(attrs={"class": "form-control"}),
             "cartao": forms.Select(attrs={"class": "form-control"}),
             "descricao": forms.TextInput(attrs={"class": "form-control"}),
-            "valor": forms.NumberInput(attrs={"class": "form-control", "type": "number"}),
+            "valor": forms.NumberInput(
+                attrs={"class": "form-control", "type": "number"}
+            ),
             "tipo": forms.Select(attrs={"class": "form-control"}),
             "status": forms.Select(attrs={"class": "form-control"}),
             "data_movimentacao": forms.DateInput(
@@ -109,6 +111,19 @@ class MovimentacaoForm(forms.ModelForm):
                 "total_parcelas",
                 "Informe em quantas parcelas deseja dividir o pagamento.",
             )
+
+        valor = cleaned_data.get("valor")
+        if valor is not None and valor <= 0:
+            self.add_error("valor", "O valor deve ser maior que zero.")
+
+        data_mov = cleaned_data.get("data_movimentacao")
+        data_venc = cleaned_data.get("data_vencimento")
+        if data_mov and data_venc and data_venc < data_mov:
+            self.add_error(
+                "data_movimentacao",
+                "O vencimento não pode ser antes da data da movimentação.",
+            )
+
         return cleaned_data
 
 
@@ -147,6 +162,11 @@ class TransferenciaForm(forms.ModelForm):
                 "conta_destino",
                 "Conta de destino não pode ser a mesma que a conta de origem.",
             )
+
+        valor = cleaned_data.get("valor")
+        if valor is not None and valor <= 0:
+            self.add_error("valor", "O valor deve ser maior que zero.")
+
         return cleaned_data
 
 
