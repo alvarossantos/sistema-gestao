@@ -3,39 +3,50 @@
 {% block title %}{{ cartao_credito.nome }}{% endblock %}
 
 {% block content %}
+<div class="page-header">
+    <div class="d-flex align-items-center gap-3">
+        <span class="page-header-icon"><i class="bi bi-credit-card"></i></span>
+        <div>
+            <h2>{{ cartao_credito.nome }}</h2>
+            <div class="page-subtitle">Detalhes do cartão de crédito</div>
+        </div>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'financas:cartao-editar' cartao_credito.pk %}" class="btn btn-warning">
+            <i class="bi bi-pencil me-1"></i> Editar
+        </a>
+        <a href="{% url 'financas:cartao-listar' %}" class="btn btn-light border">
+            <i class="bi bi-arrow-left me-1"></i> Voltar
+        </a>
+    </div>
+</div>
+
 <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div class="col-lg-6">
         <div class="card">
-            <div class="card-header">
-                <h4>{{ cartao_credito.nome }}</h4>
-            </div>
-            <div class="card-body">
+            <div class="card-body p-4">
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between">
-                        <strong>Nome:</strong>
-                        <span>{{ cartao_credito.nome }}</span>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Nome</span>
+                        <strong>{{ cartao_credito.nome }}</strong>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between">
-                        <strong>Limite:</strong>
-                        <span>R$ {{ cartao_credito.limite }}</span>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Limite</span>
+                        <strong>R$ {{ cartao_credito.limite }}</strong>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between">
-                        <strong>Dia de Fechamento:</strong>
-                        <span>Dia {{ cartao_credito.dia_fechamento }}</span>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Dia de Fechamento</span>
+                        <strong>Dia {{ cartao_credito.dia_fechamento }}</strong>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between">
-                        <strong>Dia de Vencimento:</strong>
-                        <span>Dia {{ cartao_credito.dia_vencimento }}</span>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Dia de Vencimento</span>
+                        <strong>Dia {{ cartao_credito.dia_vencimento }}</strong>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between">
-                        <strong>Conta de Pagamento:</strong>
-                        <span>{{ cartao_credito.conta_pagamento }}</span>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Conta de Pagamento</span>
+                        <strong>{{ cartao_credito.conta_pagamento }}</strong>
                     </li>
                 </ul>
-            </div>
-            <div class="card-footer d-flex gap-2">
-                <a href="{% url 'financas:cartao-editar' cartao_credito.pk %}" class="btn btn-warning">Editar</a>
-                <a href="{% url 'financas:cartao-listar' %}" class="btn btn-secondary">Voltar</a>
             </div>
         </div>
     </div>

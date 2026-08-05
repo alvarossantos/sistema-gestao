@@ -3,44 +3,57 @@
 {% block title %}Cartões de Crédito{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Cartões de Crédito</h2>
-    <a href="{% url 'financas:cartao-nova' %}" class="btn btn-primary">+ Novo Cartão</a>
+<div class="page-header">
+    <div class="d-flex align-items-center gap-3">
+        <span class="page-header-icon"><i class="bi bi-credit-card"></i></span>
+        <div>
+            <h2>Cartões de Crédito</h2>
+            <div class="page-subtitle">Acompanhe limites e datas dos seus cartões</div>
+        </div>
+    </div>
+    <a href="{% url 'financas:cartao-nova' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Novo Cartão
+    </a>
 </div>
 
 {% if cartao_credito %}
-<div class="table-responsive">
-    <table class="table table-striped table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th>Nome</th>
-                <th>Limite</th>
-                <th>Fechamento</th>
-                <th>Vencimento</th>
-                <th>Conta Pagamento</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for cartao in cartao_credito %}
-            <tr>
-                <td>{{ cartao.nome }}</td>
-                <td>R$ {{ cartao.limite }}</td>
-                <td>Dia {{ cartao.dia_fechamento }}</td>
-                <td>Dia {{ cartao.dia_vencimento }}</td>
-                <td>{{ cartao.conta_pagamento }}</td>
-                <td>
-                    <a href="{% url 'financas:cartao-detalhe' cartao.pk %}" class="btn btn-sm btn-outline-primary">Ver</a>
-                    <a href="{% url 'financas:cartao-editar' cartao.pk %}" class="btn btn-sm btn-outline-warning">Editar</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="table-wrapper">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nome</th>
+                    <th>Limite</th>
+                    <th class="hide-sm">Fechamento</th>
+                    <th class="hide-sm">Vencimento</th>
+                    <th class="hide-sm">Conta Pagamento</th>
+                    <th class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cartao in cartao_credito %}
+                <tr>
+                    <td class="fw-semibold">{{ cartao.nome }}</td>
+                    <td>R$ {{ cartao.limite }}</td>
+                    <td class="hide-sm">Dia {{ cartao.dia_fechamento }}</td>
+                    <td class="hide-sm">Dia {{ cartao.dia_vencimento }}</td>
+                    <td class="hide-sm">{{ cartao.conta_pagamento }}</td>
+                    <td>
+                        <div class="table-actions justify-content-end">
+                            <a href="{% url 'financas:cartao-detalhe' cartao.pk %}" class="btn btn-sm btn-outline-primary" title="Ver"><i class="bi bi-eye"></i></a>
+                            <a href="{% url 'financas:cartao-editar' cartao.pk %}" class="btn btn-sm btn-outline-warning" title="Editar"><i class="bi bi-pencil"></i></a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% else %}
-<div class="alert alert-info">
-    Nenhum cartão cadastrado. <a href="{% url 'financas:cartao-nova' %}">Crie o primeiro!</a>
+<div class="alert alert-info d-flex align-items-center gap-2">
+    <i class="bi bi-info-circle"></i>
+    <div>Nenhum cartão cadastrado. <a href="{% url 'financas:cartao-nova' %}" class="fw-semibold">Crie o primeiro!</a></div>
 </div>
 {% endif %}
 {% endblock %}

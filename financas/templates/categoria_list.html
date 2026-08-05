@@ -3,57 +3,71 @@
 {% block title %}Categorias{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Categorias</h2>
-    <a href="{% url 'financas:categoria-nova' %}" class="btn btn-primary">+ Nova Categoria</a>
+<div class="page-header">
+    <div class="d-flex align-items-center gap-3">
+        <span class="page-header-icon"><i class="bi bi-tags"></i></span>
+        <div>
+            <h2>Categorias</h2>
+            <div class="page-subtitle">Organize suas receitas e despesas</div>
+        </div>
+    </div>
+    <a href="{% url 'financas:categoria-nova' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Nova Categoria
+    </a>
 </div>
 
 {% if categorias %}
-<div class="table-responsive">
-    <table class="table table-striped table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th>Nome</th>
-                <th>Tipo</th>
-                <th>Categoria Pai</th>
-                <th>Cor</th>
-                <th>Status</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for cat in categorias %}
-            <tr>
-                <td>{{ cat.nome }}</td>
-                <td>
-                    <span class="badge {% if cat.tipo == 'RECEITA' %}bg-success{% else %}bg-danger{% endif %}">
-                        {{ cat.get_tipo_display }}
-                    </span>
-                </td>
-                <td>{{ cat.categoria_pai|default:"-" }}</td>
-                <td>
-                    <span class="badge" style="background-color: {{ cat.cor }};">{{ cat.cor }}</span>
-                </td>
-                <td>
-                    {% if cat.ativa %}
-                        <span class="badge bg-success">Ativa</span>
-                    {% else %}
-                        <span class="badge bg-secondary">Inativa</span>
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{% url 'financas:categoria-detalhe' cat.pk %}" class="btn btn-sm btn-outline-primary">Ver</a>
-                    <a href="{% url 'financas:categoria-editar' cat.pk %}" class="btn btn-sm btn-outline-warning">Editar</a>
-                    <a href="{% url 'financas:categoria-desativar' cat.pk %}" class="btn btn-sm btn-outline-danger">Desativar</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="table-wrapper">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                    <th class="hide-sm">Categoria Pai</th>
+                    <th class="hide-sm">Cor</th>
+                    <th>Status</th>
+                    <th class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cat in categorias %}
+                <tr>
+                    <td class="fw-semibold">{{ cat.nome }}</td>
+                    <td>
+                        <span class="badge {% if cat.tipo == 'RECEITA' %}bg-success{% else %}bg-danger{% endif %}">
+                            <i class="bi {% if cat.tipo == 'RECEITA' %}bi-arrow-down-circle{% else %}bi-arrow-up-circle{% endif %} me-1"></i>
+                            {{ cat.get_tipo_display }}
+                        </span>
+                    </td>
+                    <td class="hide-sm">{{ cat.categoria_pai|default:"-" }}</td>
+                    <td class="hide-sm">
+                        <span class="badge border" style="background-color: {{ cat.cor }}; color: #fff;">{{ cat.cor }}</span>
+                    </td>
+                    <td>
+                        {% if cat.ativa %}
+                            <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Ativa</span>
+                        {% else %}
+                            <span class="badge bg-secondary"><i class="bi bi-x-circle me-1"></i>Inativa</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="table-actions justify-content-end">
+                            <a href="{% url 'financas:categoria-detalhe' cat.pk %}" class="btn btn-sm btn-outline-primary" title="Ver"><i class="bi bi-eye"></i></a>
+                            <a href="{% url 'financas:categoria-editar' cat.pk %}" class="btn btn-sm btn-outline-warning" title="Editar"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'financas:categoria-desativar' cat.pk %}" class="btn btn-sm btn-outline-danger" title="Desativar"><i class="bi bi-power"></i></a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% else %}
-<div class="alert alert-info">
-    Nenhuma categoria cadastrada. <a href="{% url 'financas:categoria-nova' %}">Crie sua primeira categoria!</a>
+<div class="alert alert-info d-flex align-items-center gap-2">
+    <i class="bi bi-info-circle"></i>
+    <div>Nenhuma categoria cadastrada. <a href="{% url 'financas:categoria-nova' %}" class="fw-semibold">Crie sua primeira categoria!</a></div>
 </div>
 {% endif %}
 {% endblock %}

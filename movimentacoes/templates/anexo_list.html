@@ -3,39 +3,52 @@
 {% block title %}Anexos{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Anexos</h2>
-    <a href="{% url 'movimentacoes:anexo-nova' %}" class="btn btn-primary">+ Novo Anexo</a>
+<div class="page-header">
+    <div class="d-flex align-items-center gap-3">
+        <span class="page-header-icon"><i class="bi bi-paperclip"></i></span>
+        <div>
+            <h2>Anexos</h2>
+            <div class="page-subtitle">Documentos e comprovantes das suas movimentações</div>
+        </div>
+    </div>
+    <a href="{% url 'movimentacoes:anexo-nova' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Novo Anexo
+    </a>
 </div>
 
 {% if anexos %}
-<div class="table-responsive">
-    <table class="table table-striped table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th>Movimentação</th>
-                <th>Arquivo</th>
-                <th>Enviado em</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for anexo in anexos %}
-            <tr>
-                <td>{{ anexo.movimentacao }}</td>
-                <td>{{ anexo.arquivo.name }}</td>
-                <td>{{ anexo.enviado_em|date:"d/m/Y H:i" }}</td>
-                <td>
-                    <a href="{% url 'movimentacoes:anexo-detalhe' anexo.pk %}" class="btn btn-sm btn-outline-primary">Ver</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="table-wrapper">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Movimentação</th>
+                    <th class="hide-sm">Arquivo</th>
+                    <th class="hide-sm">Enviado em</th>
+                    <th class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for anexo in anexos %}
+                <tr>
+                    <td class="fw-semibold">{{ anexo.movimentacao }}</td>
+                    <td class="hide-sm"><i class="bi bi-file-earmark me-1 text-muted"></i>{{ anexo.arquivo.name }}</td>
+                    <td class="hide-sm">{{ anexo.enviado_em|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        <div class="table-actions justify-content-end">
+                            <a href="{% url 'movimentacoes:anexo-detalhe' anexo.pk %}" class="btn btn-sm btn-outline-primary" title="Ver"><i class="bi bi-eye"></i></a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% else %}
-<div class="alert alert-info">
-    Nenhum anexo cadastrado. <a href="{% url 'movimentacoes:anexo-nova' %}">Adicione o primeiro!</a>
+<div class="alert alert-info d-flex align-items-center gap-2">
+    <i class="bi bi-info-circle"></i>
+    <div>Nenhum anexo cadastrado. <a href="{% url 'movimentacoes:anexo-nova' %}" class="fw-semibold">Adicione o primeiro!</a></div>
 </div>
 {% endif %}
 {% endblock %}

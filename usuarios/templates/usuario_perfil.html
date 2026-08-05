@@ -3,33 +3,53 @@
 {% block title %}Meu Perfil{% endblock %}
 
 {% block content %}
+<div class="page-header">
+    <div class="d-flex align-items-center gap-3">
+        <span class="page-header-icon"><i class="bi bi-person"></i></span>
+        <div>
+            <h2>Meu Perfil</h2>
+            <div class="page-subtitle">Suas informações de conta</div>
+        </div>
+    </div>
+    <a href="{% url 'usuarios:usuario-perfil-atualizar' %}" class="btn btn-primary">
+        <i class="bi bi-pencil"></i> Editar Perfil
+    </a>
+</div>
+
 <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div class="col-lg-6">
         <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4>Meu Perfil</h4>
-                <a href="{% url 'usuarios:usuario-perfil-atualizar' %}" class="btn btn-sm btn-primary">Editar</a>
-            </div>
-            <div class="card-body">
-                {% if usuario.foto %}
-                <div class="text-center mb-3">
-                    <img src="{{ usuario.foto.url }}" alt="Foto de perfil" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    {% if usuario.foto %}
+                        <img src="{{ usuario.foto.url }}" alt="Foto de perfil" class="avatar">
+                    {% else %}
+                        <div class="avatar d-inline-flex align-items-center justify-content-center bg-primary text-white fs-1">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                    {% endif %}
+                    <h5 class="mt-3 mb-0 fw-bold">{{ usuario.primeiro_nome }} {{ usuario.ultimo_nome }}</h5>
+                    <span class="text-muted small">@{{ usuario.username }}</span>
                 </div>
-                {% endif %}
-                <table class="table">
-                    <tr>
-                        <th>Usuário:</th>
-                        <td>{{ usuario.username }}</td>
-                    </tr>
-                    <tr>
-                        <th>Nome:</th>
-                        <td>{{ usuario.primeiro_nome }} {{ usuario.ultimo_nome }}</td>
-                    </tr>
-                    <tr>
-                        <th>Email:</th>
-                        <td>{{ usuario.email }}</td>
-                    </tr>
-                </table>
+
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted"><i class="bi bi-person me-2"></i>Usuário</span>
+                        <strong>{{ usuario.username }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted"><i class="bi bi-envelope me-2"></i>E-mail</span>
+                        <strong>{{ usuario.email }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted"><i class="bi bi-person-badge me-2"></i>Nome</span>
+                        <strong>{{ usuario.primeiro_nome }} {{ usuario.ultimo_nome }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted"><i class="bi bi-calendar-check me-2"></i>Membro desde</span>
+                        <strong>{{ usuario.criado_em|date:"d/m/Y"|default:"-" }}</strong>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>

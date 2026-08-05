@@ -3,31 +3,45 @@
 {% block title %}Anexo{% endblock %}
 
 {% block content %}
+<div class="page-header">
+    <div class="d-flex align-items-center gap-3">
+        <span class="page-header-icon"><i class="bi bi-paperclip"></i></span>
+        <div>
+            <h2>Detalhes do Anexo</h2>
+            <div class="page-subtitle">Arquivo vinculado a uma movimentação</div>
+        </div>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{{ anexo.arquivo.url }}" class="btn btn-primary" target="_blank" rel="noopener">
+            <i class="bi bi-download me-1"></i> Download
+        </a>
+        <a href="{% url 'movimentacoes:listaranexo' %}" class="btn btn-light border">
+            <i class="bi bi-arrow-left me-1"></i> Voltar
+        </a>
+    </div>
+</div>
+
 <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div class="col-lg-6">
         <div class="card">
-            <div class="card-header">
-                <h4>Detalhes do Anexo</h4>
-            </div>
-            <div class="card-body">
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <span class="page-header-icon"><i class="bi bi-file-earmark fs-1"></i></span>
+                </div>
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between">
-                        <strong>Movimentação:</strong>
-                        <span>{{ anexo.movimentacao }}</span>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Movimentação</span>
+                        <strong>{{ anexo.movimentacao }}</strong>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between">
-                        <strong>Arquivo:</strong>
-                        <span>{{ anexo.arquivo.name }}</span>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Arquivo</span>
+                        <strong>{{ anexo.arquivo.name }}</strong>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between">
-                        <strong>Enviado em:</strong>
-                        <span>{{ anexo.enviado_em|date:"d/m/Y H:i" }}</span>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Enviado em</span>
+                        <strong>{{ anexo.enviado_em|date:"d/m/Y H:i" }}</strong>
                     </li>
                 </ul>
-            </div>
-            <div class="card-footer d-flex gap-2">
-                <a href="{{ anexo.arquivo.url }}" class="btn btn-primary" target="_blank">Download</a>
-                <a href="{% url 'movimentacoes:listaranexo' %}" class="btn btn-secondary">Voltar</a>
             </div>
         </div>
     </div>

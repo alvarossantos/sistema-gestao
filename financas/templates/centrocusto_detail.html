@@ -3,39 +3,47 @@
 {% block title %}{{ centrocusto.nome }}{% endblock %}
 
 {% block content %}
+<div class="page-header">
+    <div class="d-flex align-items-center gap-3">
+        <span class="page-header-icon"><i class="bi bi-diagram-3"></i></span>
+        <div>
+            <h2>{{ centrocusto.nome }}</h2>
+            <div class="page-subtitle">Detalhes do centro de custo</div>
+        </div>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'financas:centrocusto-editar' centrocusto.pk %}" class="btn btn-warning">
+            <i class="bi bi-pencil me-1"></i> Editar
+        </a>
+        <a href="{% url 'financas:centrocusto-desativar' centrocusto.pk %}" class="btn btn-outline-danger">
+            <i class="bi bi-power me-1"></i> Desativar
+        </a>
+        <a href="{% url 'financas:centrocusto-listar' %}" class="btn btn-light border">
+            <i class="bi bi-arrow-left me-1"></i> Voltar
+        </a>
+    </div>
+</div>
+
 <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div class="col-lg-6">
         <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4>{{ centrocusto.nome }}</h4>
-                {% if centrocusto.ativo %}
-                    <span class="badge bg-success">Ativo</span>
-                {% else %}
-                    <span class="badge bg-secondary">Inativo</span>
-                {% endif %}
-            </div>
-            <div class="card-body">
+            <div class="card-body p-4">
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between">
-                        <strong>Nome:</strong>
-                        <span>{{ centrocusto.nome }}</span>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Nome</span>
+                        <strong>{{ centrocusto.nome }}</strong>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between">
-                        <strong>Status:</strong>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Status</span>
                         <span>
                             {% if centrocusto.ativo %}
-                                <span class="badge bg-success">Ativo</span>
+                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Ativo</span>
                             {% else %}
-                                <span class="badge bg-secondary">Inativo</span>
+                                <span class="badge bg-secondary"><i class="bi bi-x-circle me-1"></i>Inativo</span>
                             {% endif %}
                         </span>
                     </li>
                 </ul>
-            </div>
-            <div class="card-footer d-flex gap-2">
-                <a href="{% url 'financas:centrocusto-editar' centrocusto.pk %}" class="btn btn-warning">Editar</a>
-                <a href="{% url 'financas:centrocusto-desativar' centrocusto.pk %}" class="btn btn-danger">Desativar</a>
-                <a href="{% url 'financas:centrocusto-listar' %}" class="btn btn-secondary">Voltar</a>
             </div>
         </div>
     </div>

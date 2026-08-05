@@ -4,43 +4,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% endblock %}</title>
+    <title>{% block title %}Sistema Gestão{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="{% static 'css/custom.css' %}" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    {% if user.is_authenticated %}
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-app sticky-top">
         <div class="container">
-                <a class="navbar-brand" href="{% url 'usuarios:usuario-perfil' %}">Sistema Gestão</a>
-            {% if user.is_authenticated %}
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="{% url 'financas:conta-listar' %}">Contas</a>
-                <a class="nav-link" href="{% url 'financas:categoria-listar' %}">Categorias</a>
-                <a class="nav-link" href="{% url 'financas:centrocusto-listar' %}">Centros de Custo</a>
-                <a class="nav-link" href="{% url 'financas:cartao-listar' %}">Cartões</a>
-                <a class="nav-link" href="{% url 'financas:forma-listar' %}">Formas Pgto</a>
-                <a class="nav-link" href="{% url 'movimentacoes:listarmovimentacao' %}">Movimentações</a>
-                <a class="nav-link" href="{% url 'movimentacoes:listartransferencia' %}">Transferências</a>
-                <a class="nav-link" href="{% url 'movimentacoes:listaranexo' %}">Anexos</a>
-                <a class="nav-link" href="{% url 'usuarios:usuario-perfil' %}">Perfil</a>
-                <a class="nav-link" href="{% url 'usuarios:usuario-logout' %}">Sair</a>
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'usuarios:usuario-perfil' %}">
+                <span class="brand-logo"><i class="bi bi-wallet2"></i></span>
+                <span class="fw-bold">Sistema Gestão</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain"
+                    aria-controls="navbarMain" aria-expanded="false" aria-label="Alternar menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'movimentacoes:listarmovimentacao' %}">
+                            <i class="bi bi-arrow-left-right me-1"></i>Movimentações
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'movimentacoes:listartransferencia' %}">
+                            <i class="bi bi-arrow-repeat me-1"></i>Transferências
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-gear me-1"></i>Cadastros
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'financas:conta-listar' %}"><i class="bi bi-wallet2 me-2"></i>Contas</a></li>
+                            <li><a class="dropdown-item" href="{% url 'financas:categoria-listar' %}"><i class="bi bi-tags me-2"></i>Categorias</a></li>
+                            <li><a class="dropdown-item" href="{% url 'financas:centrocusto-listar' %}"><i class="bi bi-diagram-3 me-2"></i>Centros de Custo</a></li>
+                            <li><a class="dropdown-item" href="{% url 'financas:cartao-listar' %}"><i class="bi bi-credit-card me-2"></i>Cartões</a></li>
+                            <li><a class="dropdown-item" href="{% url 'financas:forma-listar' %}"><i class="bi bi-cash-coin me-2"></i>Formas de Pagamento</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'movimentacoes:listaranexo' %}"><i class="bi bi-paperclip me-2"></i>Anexos</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle fs-5"></i>{{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><span class="dropdown-item-text small text-muted">{{ user.email|default:"" }}</span></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'usuarios:usuario-perfil' %}"><i class="bi bi-person me-2"></i>Meu Perfil</a></li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'usuarios:usuario-logout' %}"><i class="bi bi-box-arrow-right me-2"></i>Sair</a></li>
+                        </ul>
+                    </li>
+                </ul>
             </div>
-            {% endif %}
         </div>
     </nav>
+    {% endif %}
 
-    <div class="container mt-4">
+    <main class="{% if user.is_authenticated %}container py-4{% endif %}">
         {% if messages %}
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show shadow-sm" role="alert">
+                    <i class="bi bi-info-circle me-1"></i>
                     {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
                 </div>
             {% endfor %}
         {% endif %}
 
         {% block content %}{% endblock %}
-    </div>
+    </main>
+
+    {% if user.is_authenticated %}
+    <footer class="footer-app mt-auto">
+        <div class="container d-flex justify-content-between flex-wrap gap-2">
+            <span><i class="bi bi-wallet2 me-1"></i>Sistema Gestão © 2026</span>
+            <span class="opacity-75">Seu controle financeiro pessoal</span>
+        </div>
+    </footer>
+    {% endif %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

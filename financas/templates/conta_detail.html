@@ -3,40 +3,52 @@
 {% block title %}{{ conta.nome }}{% endblock %}
 
 {% block content %}
+<div class="page-header">
+    <div class="d-flex align-items-center gap-3">
+        <span class="page-header-icon"><i class="bi bi-wallet2"></i></span>
+        <div>
+            <h2>{{ conta.nome }}</h2>
+            <div class="page-subtitle">Detalhes da conta</div>
+        </div>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'financas:conta-editar' conta.pk %}" class="btn btn-warning">
+            <i class="bi bi-pencil me-1"></i> Editar
+        </a>
+        <a href="{% url 'financas:conta-listar' %}" class="btn btn-light border">
+            <i class="bi bi-arrow-left me-1"></i> Voltar
+        </a>
+    </div>
+</div>
+
 <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div class="col-lg-6">
         <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4>{{ conta.nome }}</h4>
-                {% if conta.ativa %}
-                    <span class="badge bg-success">Ativa</span>
-                {% else %}
-                    <span class="badge bg-secondary">Inativa</span>
-                {% endif %}
-            </div>
-            <div class="card-body">
+            <div class="card-body p-4">
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between">
-                        <strong>Tipo:</strong>
-                        <span>{{ conta.get_tipo_display }}</span>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Tipo</span>
+                        <strong>{{ conta.get_tipo_display }}</strong>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between">
-                        <strong>Saldo Inicial:</strong>
-                        <span>R$ {{ conta.saldo_inicial }}</span>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Saldo Inicial</span>
+                        <strong>R$ {{ conta.saldo_inicial }}</strong>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between">
-                        <strong>Criado em:</strong>
-                        <span>{{ conta.criado_em|default:"-" }}</span>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Status</span>
+                        <span>
+                            {% if conta.ativa %}
+                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Ativa</span>
+                            {% else %}
+                                <span class="badge bg-secondary"><i class="bi bi-x-circle me-1"></i>Inativa</span>
+                            {% endif %}
+                        </span>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between">
-                        <strong>Ativa:</strong>
-                        <span>{{ conta.ativa|yesno:"Sim,Não" }}</span>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Criado em</span>
+                        <strong>{{ conta.criado_em|date:"d/m/Y H:i"|default:"-" }}</strong>
                     </li>
                 </ul>
-            </div>
-            <div class="card-footer d-flex gap-2">
-                <a href="{% url 'financas:conta-editar' conta.pk %}" class="btn btn-warning">Editar</a>
-                <a href="{% url 'financas:conta-listar' %}" class="btn btn-secondary">Voltar</a>
             </div>
         </div>
     </div>

@@ -3,15 +3,28 @@
 {% block title %}Nova Forma de Pagamento{% endblock %}
 
 {% block content %}
+<div class="page-header">
+    <div class="d-flex align-items-center gap-3">
+        <span class="page-header-icon"><i class="bi bi-cash-coin"></i></span>
+        <div>
+            <h2>Nova Forma de Pagamento</h2>
+            <div class="page-subtitle">Adicione uma nova forma de pagamento</div>
+        </div>
+    </div>
+</div>
+
 <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div class="col-lg-6">
         <div class="card">
-            <div class="card-header">
-                <h4>Nova Forma de Pagamento</h4>
-            </div>
-            <div class="card-body">
-                <form method="post">
+            <div class="card-body p-4">
+                <form method="post" novalidate>
                     {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        {% for error in form.non_field_errors %}
+                            <div class="alert alert-danger py-2 small">{{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
 
                     {% for field in form %}
                     <div class="mb-3">
@@ -19,15 +32,15 @@
                         {{ field }}
                         {% if field.errors %}
                             {% for error in field.errors %}
-                                <div class="text-danger">{{ error }}</div>
+                                <div class="text-danger small mt-1"><i class="bi bi-x-circle me-1"></i>{{ error }}</div>
                             {% endfor %}
                         {% endif %}
                     </div>
                     {% endfor %}
 
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Salvar</button>
-                        <a href="{% url 'financas:forma-listar' %}" class="btn btn-secondary">Cancelar</a>
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i> Salvar</button>
+                        <a href="{% url 'financas:forma-listar' %}" class="btn btn-light border">Cancelar</a>
                     </div>
                 </form>
             </div>

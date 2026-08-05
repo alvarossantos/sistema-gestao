@@ -3,34 +3,48 @@
 {% block title %}Excluir Movimentação{% endblock %}
 
 {% block content %}
+<div class="page-header">
+    <div class="d-flex align-items-center gap-3">
+        <span class="page-header-icon"><i class="bi bi-trash"></i></span>
+        <div>
+            <h2>Excluir Movimentação</h2>
+            <div class="page-subtitle">Esta ação não pode ser desfeita</div>
+        </div>
+    </div>
+</div>
+
 <div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h4>Excluir Movimentação</h4>
-            </div>
-            <div class="card-body">
-                <div class="alert alert-danger">
-                    Tem certeza que deseja excluir a movimentação <strong>{{ movimentacao.descricao }}</strong>?
-                    <br><small>Esta ação não pode ser desfeita.</small>
+    <div class="col-lg-6">
+        <div class="card border-danger">
+            <div class="card-body p-4">
+                <div class="alert alert-danger d-flex gap-2">
+                    <i class="bi bi-exclamation-triangle fs-4"></i>
+                    <div>
+                        Tem certeza que deseja excluir a movimentação <strong>{{ movimentacao.descricao }}</strong>?
+                        <br><small>Esta ação não pode ser desfeita.</small>
+                    </div>
                 </div>
 
                 <ul class="list-group list-group-flush mb-3">
-                    <li class="list-group-item d-flex justify-content-between">
-                        <strong>Valor:</strong>
-                        <span>R$ {{ movimentacao.valor }}</span>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Valor</span>
+                        <strong>R$ {{ movimentacao.valor }}</strong>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between">
-                        <strong>Data:</strong>
-                        <span>{{ movimentacao.data_movimentacao|date:"d/m/Y" }}</span>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Data</span>
+                        <strong>{{ movimentacao.data_movimentacao|date:"d/m/Y" }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Tipo</span>
+                        <span class="badge {% if movimentacao.tipo == 'RECEITA' %}bg-success{% else %}bg-danger{% endif %}">{{ movimentacao.get_tipo_display }}</span>
                     </li>
                 </ul>
 
                 <form method="post">
                     {% csrf_token %}
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-danger">Excluir</button>
-                        <a href="{% url 'movimentacoes:listarmovimentacao' %}" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-danger"><i class="bi bi-trash me-1"></i> Excluir</button>
+                        <a href="{% url 'movimentacoes:listarmovimentacao' %}" class="btn btn-light border">Cancelar</a>
                     </div>
                 </form>
             </div>

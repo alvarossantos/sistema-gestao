@@ -1,68 +1,85 @@
 {% extends 'base.html' %}
 
-{% block title %}Minhas Movimentações{% endblock %}
+{% block title %}Movimentações{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Movimentações</h2>
-    <div class="d-flex gap-2">
-        <a href="{% url 'movimentacoes:listartransferencia' %}" class="btn btn-outline-secondary">Transferências</a>
-        <a href="{% url 'movimentacoes:movimentacao-nova' %}" class="btn btn-primary">+ Nova Movimentação</a>
+<div class="page-header">
+    <div class="d-flex align-items-center gap-3">
+        <span class="page-header-icon"><i class="bi bi-arrow-left-right"></i></span>
+        <div>
+            <h2>Movimentações</h2>
+            <div class="page-subtitle">Todas as suas receitas e despesas</div>
+        </div>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'movimentacoes:listartransferencia' %}" class="btn btn-light border">
+            <i class="bi bi-arrow-repeat me-1"></i>Transferências
+        </a>
+        <a href="{% url 'movimentacoes:movimentacao-nova' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Nova Movimentação
+        </a>
     </div>
 </div>
 
 {% if movimentacoes %}
-<div class="table-responsive">
-    <table class="table table-striped table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th>Descrição</th>
-                <th>Tipo</th>
-                <th>Valor</th>
-                <th>Status</th>
-                <th>Conta</th>
-                <th>Categoria</th>
-                <th>Data</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for mov in movimentacoes %}
-            <tr>
-                <td>{{ mov.descricao }}</td>
-                <td>
-                    {% if mov.tipo == 'RECEITA' %}
-                        <span class="badge bg-success">Receita</span>
-                    {% else %}
-                        <span class="badge bg-danger">Despesa</span>
-                    {% endif %}
-                </td>
-                <td>R$ {{ mov.valor }}</td>
-                <td>
-                    {% if mov.status == 'PAGO' %}
-                        <span class="badge bg-success">Pago</span>
-                    {% elif mov.status == 'PENDENTE' %}
-                        <span class="badge bg-warning text-dark">Pendente</span>
-                    {% else %}
-                        <span class="badge bg-secondary">Cancelado</span>
-                    {% endif %}
-                </td>
-                <td>{{ mov.conta }}</td>
-                <td>{{ mov.categoria }}</td>
-                <td>{{ mov.data_movimentacao|date:"d/m/Y" }}</td>
-                <td>
-                    <a href="{% url 'movimentacoes:movimentacao-detalhe' mov.pk %}" class="btn btn-sm btn-outline-primary">Ver</a>
-                    <a href="{% url 'movimentacoes:movimentacao-editar' mov.pk %}" class="btn btn-sm btn-outline-warning">Editar</a>
-                    <a href="{% url 'movimentacoes:movimentacao-excluir' mov.pk %}" class="btn btn-sm btn-outline-danger">Excluir</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="table-wrapper">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Descrição</th>
+                    <th>Tipo</th>
+                    <th>Valor</th>
+                    <th>Status</th>
+                    <th class="hide-sm">Conta</th>
+                    <th class="hide-sm">Categoria</th>
+                    <th class="hide-sm">Data</th>
+                    <th class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mov in movimentacoes %}
+                <tr>
+                    <td class="fw-semibold">{{ mov.descricao }}</td>
+                    <td>
+                        {% if mov.tipo == 'RECEITA' %}
+                            <span class="badge bg-success"><i class="bi bi-arrow-down-circle me-1"></i>Receita</span>
+                        {% else %}
+                            <span class="badge bg-danger"><i class="bi bi-arrow-up-circle me-1"></i>Despesa</span>
+                        {% endif %}
+                    </td>
+                    <td class="fw-semibold {% if mov.tipo == 'RECEITA' %}text-success{% else %}text-danger{% endif %}">
+                        {% if mov.tipo == 'RECEITA' %}+{% else %}-{% endif %} R$ {{ mov.valor }}
+                    </td>
+                    <td>
+                        {% if mov.status == 'PAGO' %}
+                            <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Pago</span>
+                        {% elif mov.status == 'PENDENTE' %}
+                            <span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i>Pendente</span>
+                        {% else %}
+                            <span class="badge bg-secondary"><i class="bi bi-x-circle me-1"></i>Cancelado</span>
+                        {% endif %}
+                    </td>
+                    <td class="hide-sm">{{ mov.conta }}</td>
+                    <td class="hide-sm">{{ mov.categoria }}</td>
+                    <td class="hide-sm">{{ mov.data_movimentacao|date:"d/m/Y" }}</td>
+                    <td>
+                        <div class="table-actions justify-content-end">
+                            <a href="{% url 'movimentacoes:movimentacao-detalhe' mov.pk %}" class="btn btn-sm btn-outline-primary" title="Ver"><i class="bi bi-eye"></i></a>
+                            <a href="{% url 'movimentacoes:movimentacao-editar' mov.pk %}" class="btn btn-sm btn-outline-warning" title="Editar"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'movimentacoes:movimentacao-excluir' mov.pk %}" class="btn btn-sm btn-outline-danger" title="Excluir"><i class="bi bi-trash"></i></a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% else %}
-<div class="alert alert-info">
-    Nenhuma movimentação cadastrada. <a href="{% url 'movimentacoes:movimentacao-nova' %}">Crie a primeira!</a>
+<div class="alert alert-info d-flex align-items-center gap-2">
+    <i class="bi bi-info-circle"></i>
+    <div>Nenhuma movimentação cadastrada. <a href="{% url 'movimentacoes:movimentacao-nova' %}" class="fw-semibold">Crie a primeira!</a></div>
 </div>
 {% endif %}
 {% endblock %}

@@ -3,44 +3,62 @@
 {% block title %}Transferência de R$ {{ transferencia.valor }}{% endblock %}
 
 {% block content %}
+<div class="page-header">
+    <div class="d-flex align-items-center gap-3">
+        <span class="page-header-icon"><i class="bi bi-arrow-repeat"></i></span>
+        <div>
+            <h2>Transferência de R$ {{ transferencia.valor }}</h2>
+            <div class="page-subtitle">Detalhes da transferência</div>
+        </div>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'movimentacoes:transferencia-editar' transferencia.pk %}" class="btn btn-warning">
+            <i class="bi bi-pencil me-1"></i> Editar
+        </a>
+        <a href="{% url 'movimentacoes:transferencia-excluir' transferencia.pk %}" class="btn btn-outline-danger">
+            <i class="bi bi-trash me-1"></i> Excluir
+        </a>
+        <a href="{% url 'movimentacoes:listartransferencia' %}" class="btn btn-light border">
+            <i class="bi bi-arrow-left me-1"></i> Voltar
+        </a>
+    </div>
+</div>
+
 <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div class="col-lg-6">
         <div class="card">
-            <div class="card-header">
-                <h4>Detalhes da Transferência</h4>
-            </div>
-            <div class="card-body">
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <div class="d-flex align-items-center justify-content-center gap-3">
+                        <div class="text-center">
+                            <i class="bi bi-arrow-up-right-circle text-warning fs-1"></i>
+                            <div class="fw-semibold">{{ transferencia.conta_origem }}</div>
+                        </div>
+                        <i class="bi bi-arrow-right fs-3 text-muted"></i>
+                        <div class="text-center">
+                            <i class="bi bi-arrow-down-left-circle text-success fs-1"></i>
+                            <div class="fw-semibold">{{ transferencia.conta_destino }}</div>
+                        </div>
+                    </div>
+                    <div class="fw-bold fs-3 mt-3">R$ {{ transferencia.valor }}</div>
+                </div>
+
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between">
-                        <strong>Conta Origem:</strong>
-                        <span>{{ transferencia.conta_origem }}</span>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Data</span>
+                        <strong>{{ transferencia.data|date:"d/m/Y" }}</strong>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between">
-                        <strong>Conta Destino:</strong>
-                        <span>{{ transferencia.conta_destino }}</span>
+                    {% if transferencia.observacao %}
+                    <li class="list-group-item">
+                        <span class="text-muted d-block mb-1">Observação</span>
+                        <strong>{{ transferencia.observacao }}</strong>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between">
-                        <strong>Valor:</strong>
-                        <span>R$ {{ transferencia.valor }}</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between">
-                        <strong>Data:</strong>
-                        <span>{{ transferencia.data|date:"d/m/Y" }}</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between">
-                        <strong>Observação:</strong>
-                        <span>{{ transferencia.observacao|default:"-" }}</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between">
-                        <strong>Criado em:</strong>
-                        <span>{{ transferencia.criado_em|date:"d/m/Y H:i" }}</span>
+                    {% endif %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Criado em</span>
+                        <strong>{{ transferencia.criado_em|date:"d/m/Y H:i" }}</strong>
                     </li>
                 </ul>
-            </div>
-            <div class="card-footer d-flex gap-2">
-                <a href="{% url 'movimentacoes:transferencia-editar' transferencia.pk %}" class="btn btn-warning">Editar</a>
-                <a href="{% url 'movimentacoes:transferencia-excluir' transferencia.pk %}" class="btn btn-danger">Excluir</a>
-                <a href="{% url 'movimentacoes:listartransferencia' %}" class="btn btn-secondary">Voltar</a>
             </div>
         </div>
     </div>

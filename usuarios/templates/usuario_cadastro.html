@@ -1,36 +1,53 @@
 {% extends 'base.html' %}
 
-{% block title %}Cadastro{% endblock %}
+{% block title %}Cadastro | Sistema Gestão{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h4>Cadastro</h4>
+<div class="auth-wrapper">
+    <div class="auth-card card">
+        <div class="card-body p-4 p-md-5">
+            <div class="auth-brand">
+                <span class="brand-logo"><i class="bi bi-person-plus"></i></span>
+                <h4>Criar Conta</h4>
+                <p>Comece a organizar suas finanças</p>
             </div>
-            <div class="card-body">
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
 
-                    {% for field in form %}
-                    <div class="mb-3">
-                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.errors %}
-                            {% for error in field.errors %}
-                                <div class="text-danger">{{ error }}</div>
-                            {% endfor %}
-                        {% endif %}
-                    </div>
+            <form method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    {% for error in form.non_field_errors %}
+                        <div class="alert alert-danger py-2 small">
+                            <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                        </div>
                     {% endfor %}
+                {% endif %}
 
-                    <button type="submit" class="btn btn-primary w-100">Cadastrar</button>
-                </form>
-                <div class="mt-3 text-center">
-                    <a href="{% url 'usuarios:usuario-login' %}">Já tem conta? Faça login</a>
+                {% for field in form %}
+                <div class="mb-3">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <div class="form-text">{{ field.help_text }}</div>
+                    {% endif %}
+                    {% if field.errors %}
+                        {% for error in field.errors %}
+                            <div class="text-danger small mt-1"><i class="bi bi-x-circle me-1"></i>{{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
-            </div>
+                {% endfor %}
+
+                <button type="submit" class="btn btn-primary w-100 py-2 mt-2">
+                    <i class="bi bi-check-lg me-1"></i> Cadastrar
+                </button>
+            </form>
+
+            <hr class="my-4">
+            <p class="text-center mb-0 small text-muted">
+                Já tem conta?
+                <a href="{% url 'usuarios:usuario-login' %}" class="fw-semibold text-decoration-none">Faça login</a>
+            </p>
         </div>
     </div>
 </div>
