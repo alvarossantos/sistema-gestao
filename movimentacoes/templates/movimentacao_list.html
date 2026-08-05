@@ -65,6 +65,12 @@
                     <td class="hide-sm">{{ mov.data_movimentacao|date:"d/m/Y" }}</td>
                     <td>
                         <div class="table-actions justify-content-end">
+                            {% if mov.status == 'PENDENTE' %}
+                            <form method="post" action="{% url 'movimentacoes:movimentacao-pagar' mov.pk %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-success" title="Marcar como paga"><i class="bi bi-check-circle"></i></button>
+                            </form>
+                            {% endif %}
                             <a href="{% url 'movimentacoes:movimentacao-detalhe' mov.pk %}" class="btn btn-sm btn-outline-primary" title="Ver"><i class="bi bi-eye"></i></a>
                             <a href="{% url 'movimentacoes:movimentacao-editar' mov.pk %}" class="btn btn-sm btn-outline-warning" title="Editar"><i class="bi bi-pencil"></i></a>
                             <a href="{% url 'movimentacoes:movimentacao-excluir' mov.pk %}" class="btn btn-sm btn-outline-danger" title="Excluir"><i class="bi bi-trash"></i></a>

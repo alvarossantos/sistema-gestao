@@ -258,7 +258,7 @@ class AnexoMovimentacaoUpdateView(LoginRequiredMixin, UpdateView):
 
 class AnexoMovimentacaoDeleteView(LoginRequiredMixin, DeleteView):
     model = AnexoMovimentacao
-    template_name = "anexo__confirm_delete.html"
+    template_name = "anexo_confirm_delete.html"
     context_object_name = "anexo"
     success_url = reverse_lazy("movimentacoes:listaranexo")
 

@@ -12,6 +12,12 @@
         </div>
     </div>
     <div class="d-flex gap-2 flex-wrap">
+        {% if movimentacao.status == 'PENDENTE' %}
+        <form method="post" action="{% url 'movimentacoes:movimentacao-pagar' movimentacao.pk %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success"><i class="bi bi-check-circle me-1"></i> Marcar como paga</button>
+        </form>
+        {% endif %}
         <a href="{% url 'movimentacoes:movimentacao-editar' movimentacao.pk %}" class="btn btn-warning">
             <i class="bi bi-pencil me-1"></i> Editar
         </a>
