@@ -96,7 +96,7 @@ class CartaoCredito(models.Model):
                 cartao=self, tipo="DESPESA",
                 data_movimentacao__gte=inicio, data_movimentacao__lte=fechamento,
             )
-            .exclude(tipo="CANCELADO")
+            .exclude(status="CANCELADO")
             .aggregate(total=Sum("valor"))["total"]
         )
         return total or Decimal("0")

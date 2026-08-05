@@ -120,7 +120,7 @@ class MovimentacaoForm(forms.ModelForm):
         data_venc = cleaned_data.get("data_vencimento")
         if data_mov and data_venc and data_venc < data_mov:
             self.add_error(
-                "data_movimentacao",
+                "data_vencimento",
                 "O vencimento não pode ser antes da data da movimentação.",
             )
 
