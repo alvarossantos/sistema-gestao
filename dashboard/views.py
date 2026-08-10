@@ -40,7 +40,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         proximos_vencimentos = Movimentacao.objects.filter(
             usuario=usuario,
             status="PENDENTE",
-            data_movimentacao__gte=hoje,
+            data_vencimento__gte=hoje,
         ).order_by("data_vencimento")[:5]
 
         cartoes = CartaoCredito.objects.filter(usuario=usuario)
