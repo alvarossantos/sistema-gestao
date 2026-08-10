@@ -5,26 +5,40 @@ from django.db import models
 
 class Movimentacao(models.Model):
     TIPO_CHOICES: ClassVar[list[tuple[str, str]]] = [
-        ('RECEITA', 'Receita'),
-        ('DESPESA', 'Despesa'),
+        ("RECEITA", "Receita"),
+        ("DESPESA", "Despesa"),
     ]
     STATUS_CHOICES: ClassVar[list[tuple[str, str]]] = [
-        ('PENDENTE', 'Pendente'),
-        ('PAGO', 'Pago'),
-        ('CANCELADO', 'Cancelado'),
+        ("PENDENTE", "Pendente"),
+        ("PAGO", "Pago"),
+        ("CANCELADO", "Cancelado"),
     ]
 
-    usuario = models.ForeignKey('usuarios.Usuario', on_delete=models.CASCADE)
-    conta = models.ForeignKey('financas.Conta', on_delete=models.PROTECT)
-    categoria = models.ForeignKey('financas.Categoria', on_delete=models.PROTECT)
-    forma_pagamento = models.ForeignKey('financas.FormaPagamento', on_delete=models.SET_NULL, blank=True, null=True, db_column='formas_pagamento_id')
-    centro_custo = models.ForeignKey('financas.CentroCusto', on_delete=models.SET_NULL, blank=True, null=True, db_column='centros_custo_id')
-    cartao = models.ForeignKey('financas.CartaoCredito', on_delete=models.SET_NULL, blank=True, null=True)
+    usuario = models.ForeignKey("usuarios.Usuario", on_delete=models.CASCADE)
+    conta = models.ForeignKey("financas.Conta", on_delete=models.PROTECT)
+    categoria = models.ForeignKey("financas.Categoria", on_delete=models.PROTECT)
+    forma_pagamento = models.ForeignKey(
+        "financas.FormaPagamento",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        db_column="forma_pagamento_id",
+    )
+    centro_custo = models.ForeignKey(
+        "financas.CentroCusto",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        db_column="centro_custo_id",
+    )
+    cartao = models.ForeignKey(
+        "financas.CartaoCredito", on_delete=models.SET_NULL, blank=True, null=True
+    )
 
     descricao = models.CharField(max_length=255)
     valor = models.DecimalField(max_digits=12, decimal_places=2)
     tipo = models.CharField(max_length=10, choices=TIPO_CHOICES)
-    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='PENDENTE')
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default="PENDENTE")
 
     data_movimentacao = models.DateField()
     data_vencimento = models.DateField()
@@ -39,16 +53,22 @@ class Movimentacao(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'movimentacao'
+        db_table = "movimentacao"
 
     def __str__(self):
         return str(self.descricao)
 
 
 class Transferencia(models.Model):
-    usuario = models.ForeignKey('usuarios.Usuario', on_delete=models.CASCADE)
-    conta_origem = models.ForeignKey('financas.Conta', on_delete=models.PROTECT, related_name='transferencias_origem')
-    conta_destino = models.ForeignKey('financas.Conta', on_delete=models.PROTECT, related_name='transferencias_destino')
+    usuario = models.ForeignKey("usuarios.Usuario", on_delete=models.CASCADE)
+    conta_origem = models.ForeignKey(
+        "financas.Conta", on_delete=models.PROTECT, related_name="transferencias_origem"
+    )
+    conta_destino = models.ForeignKey(
+        "financas.Conta",
+        on_delete=models.PROTECT,
+        related_name="transferencias_destino",
+    )
 
     valor = models.DecimalField(max_digits=12, decimal_places=2)
     data = models.DateField()
@@ -57,7 +77,7 @@ class Transferencia(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'transferencia'
+        db_table = "transferencia"
 
     def __str__(self):
         return f"Transferência {self.valor}"
@@ -70,7 +90,7 @@ class AnexoMovimentacao(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'anexo_movimentacao'
+        db_table = "anexo_movimentacao"
 
     def __str__(self):
         return str(self.arquivo)

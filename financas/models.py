@@ -24,7 +24,7 @@ class Conta(models.Model):
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
     saldo_inicial = models.DecimalField(max_digits=12, decimal_places=2)
     ativa = models.BooleanField(default=True)
-    criado_em = models.DateTimeField(blank=True, null=True)
+    criado_em = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         managed = False

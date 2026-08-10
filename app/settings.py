@@ -28,12 +28,12 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-m^69mm-rj9p*%r*bx6gs@18e0f68))w&4g_(b#i!1_m*ce#l8t"
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-troque-em-produção")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",") if os.environ.get("ALLOWED_HOSTS") else []
 
 
 # Application definition
@@ -100,6 +100,8 @@ AUTHENTICATION_BACKENDS = [
     "usuarios.backends.UsuarioBackend",
 ]
 
+LOGIN_URL = "usuarios:usuario_login"
+
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
@@ -124,7 +126,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "pt-br"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "America/Sao_Paulo"
 
 USE_I18N = True
 

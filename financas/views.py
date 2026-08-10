@@ -17,6 +17,7 @@ class FinancasContaListView(LoginRequiredMixin, ListView):
     model = models.Conta
     template_name = "conta_list.html"
     context_object_name = "contas"
+    paginate_by = 20
 
     def get_queryset(self):
         return super().get_queryset().filter(usuario=self.request.user)
@@ -78,6 +79,7 @@ class FinancasCategoriaListView(LoginRequiredMixin, ListView):
     model = models.Categoria
     template_name = "categoria_list.html"
     context_object_name = "categorias"
+    paginate_by = 20
 
     def get_queryset(self):
         return super().get_queryset().filter(usuario=self.request.user)
@@ -93,6 +95,11 @@ class FinancasCategoriaCreateView(LoginRequiredMixin, CreateView):
         form.instance.usuario = self.request.user
         return super().form_valid(form)
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
 
 class FinancasCategoriaUpdateView(LoginRequiredMixin, UpdateView):
     model = models.Categoria
@@ -106,6 +113,12 @@ class FinancasCategoriaUpdateView(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         form.instance.usuario = self.request.user
         return super().form_valid(form)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+    
 
 
 class FinancasCategoriaDetailView(LoginRequiredMixin, DetailView):
@@ -143,6 +156,7 @@ class FinancasCentroCustoListView(LoginRequiredMixin, ListView):
     model = models.CentroCusto
     template_name = "centrocusto_list.html"
     context_object_name = "centrocustos"
+    paginate_by = 20
 
     def get_queryset(self):
         return super().get_queryset().filter(usuario=self.request.user)
@@ -210,6 +224,7 @@ class FinancasCartaoCreditoListView(LoginRequiredMixin, ListView):
     model = models.CartaoCredito
     template_name = "cartao_list.html"
     context_object_name = "cartao_credito"
+    paginate_by = 20
 
     def get_queryset(self):
         return super().get_queryset().filter(usuario=self.request.user)
@@ -253,6 +268,7 @@ class FinancasFormaPagamentoListView(LoginRequiredMixin, ListView):
     model = models.FormaPagamento
     template_name = "forma_list.html"
     context_object_name = "forma_pagamento"
+    paginate_by = 20
 
 
 class FinancasFormaPagamentoCreateView(LoginRequiredMixin, CreateView):

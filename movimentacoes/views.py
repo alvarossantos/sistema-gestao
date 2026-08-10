@@ -26,9 +26,15 @@ class MovimentacaoListView(LoginRequiredMixin, ListView):
     model = Movimentacao
     template_name = "movimentacao_list.html"
     context_object_name = "movimentacoes"
+    paginate_by = 20
 
     def get_queryset(self):
-        return super().get_queryset().filter(usuario=self.request.user)
+        return (
+            super().get_queryset()
+            .filter(usuario=self.request.user)
+            .select_related("conta", "categoria", "forma_pagamento", "centro_custo", "cartao")
+            .order_by("-data_vencimento")
+        )
 
 
 class MovimentacaoCreateView(LoginRequiredMixin, CreateView):
@@ -134,16 +140,14 @@ class MovimentacaoPagarView(LoginRequiredMixin, View):
         movimentacao.data_pagamento = timezone.localdate()
         movimentacao.save(update_fields=["status", "data_pagamento"])
         messages.success(request, f"'{movimentacao.descricao}' marcado como paga.")
-        return redirect(
-            request.META.get("HTTP_REFERER")
-            or reverse_lazy("movimentacoes:listarmovimentacao")
-        )
+        return redirect(reverse_lazy("movimentacoes:listarmovimentacao"))
 
 
 class TransferenciaListView(LoginRequiredMixin, ListView):
     model = Transferencia
     template_name = "transferencia_list.html"
     context_object_name = "transferencias"
+    paginate_by = 20
 
     def get_queryset(self):
         return super().get_queryset().filter(usuario=self.request.user)
@@ -202,6 +206,7 @@ class AnexoMovimentacaoListView(LoginRequiredMixin, ListView):
     model = AnexoMovimentacao
     template_name = "anexo_list.html"
     context_object_name = "anexos"
+    paginate_by = 20
 
     def get_queryset(self):
         return super().get_queryset().filter(movimentacao__usuario=self.request.user)

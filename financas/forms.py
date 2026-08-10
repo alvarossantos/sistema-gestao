@@ -86,6 +86,14 @@ class CategoriaForm(forms.ModelForm):
             "ativa": "Ativa",
         }
 
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if user:
+            field = cast(forms.ModelChoiceField, self.fields["categoria_pai"])
+            field.queryset = models.Categoria.objects.filter(usuario=user)
+            if self.instance.pk:
+                field.queryset = field.queryset.exclude(pk=self.instance.pk)
+
 
 class CentroCustoForm(forms.ModelForm):
     class Meta:

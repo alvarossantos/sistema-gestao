@@ -16,6 +16,9 @@ class UsuarioBackend:
         except Usuario.DoesNotExist:
             return None
 
+        if not usuario.ativo:
+            return None
+
         if check_password(password, usuario.password_hash):
             return usuario
         return None
