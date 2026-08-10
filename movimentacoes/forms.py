@@ -41,14 +41,10 @@ class MovimentacaoForm(forms.ModelForm):
                 attrs={"class": "form-control", "type": "number"}
             ),
             "tipo": forms.Select(attrs={"class": "form-control"}),
-            "status": forms.Select(attrs={"class": "form-control"}),
             "data_movimentacao": forms.DateInput(
                 attrs={"class": "form-control", "type": "date"}
             ),
             "data_vencimento": forms.DateInput(
-                attrs={"class": "form-control", "type": "date"}
-            ),
-            "data_pagamento": forms.DateInput(
                 attrs={"class": "form-control", "type": "date"}
             ),
             "numero_parcela": forms.NumberInput(attrs={"class": "form-control"}),
@@ -65,10 +61,8 @@ class MovimentacaoForm(forms.ModelForm):
             "descricao": "Descrição",
             "valor": "Valor",
             "tipo": "Tipo",
-            "status": "Status",
             "data_movimentacao": "Data de Movimentação",
             "data_vencimento": "Data de Vencimento",
-            "data_pagamento": "Data de Pagamento",
             "numero_parcela": "Número de Parcela",
             "total_parcelas": "Total de Parcelas",
             "observacao": "Observação",

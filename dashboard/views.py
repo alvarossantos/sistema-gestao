@@ -13,7 +13,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         usuario = self.request.user
-        hoje = timezone.localdate
+        hoje = timezone.localdate()
 
         contas = Conta.objects.filter(usuario=usuario, ativa=True)
         saldo_total = sum(conta.get_saldo_atual() for conta in contas)
@@ -24,22 +24,38 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             data_movimentacao__year=hoje.year,
             data_movimentacao__month=hoje.month,
         )
-        receitas_mes = movimentacoes_mes.filter(tipo="RECEITA").aggregate(total=Sum('valor'))['total'] or 0
-        despesas_mes = movimentacoes_mes.filter(tipo="DESPESA").aggregate(total=Sum('valor'))['total'] or 0
+        receitas_mes = (
+            movimentacoes_mes.filter(tipo="RECEITA").aggregate(total=Sum("valor"))[
+                "total"
+            ]
+            or 0
+        )
+        despesas_mes = (
+            movimentacoes_mes.filter(tipo="DESPESA").aggregate(total=Sum("valor"))[
+                "total"
+            ]
+            or 0
+        )
 
         proximos_vencimentos = Movimentacao.objects.filter(
             usuario=usuario,
             status="PENDENTE",
             data_movimentacao__gte=hoje,
-        ).order_by('data_vencimento')[:5]
+        ).order_by("data_vencimento")[:5]
 
         cartoes = CartaoCredito.objects.filter(usuario=usuario)
         faturas = [
             {
                 "cartao": cartao,
-                "valor": cartao.get_saldo_atual(),
-                "vencimento": cartao.get_periodo_vencimento(),
+                "valor": cartao.get_valor_fatura_digital(),
+                "vencimento": cartao.get_periodo_fatura_atual(),
             }
+            for cartao in cartoes
         ]
-        
+
+        context["saldo_total"] = saldo_total
+        context["receitas_mes"] = receitas_mes
+        context["despesas_mes"] = despesas_mes
+        context["proximos_vencimentos"] = proximos_vencimentos
+        context["faturas"] = faturas
         return context

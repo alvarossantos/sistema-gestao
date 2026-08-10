@@ -33,7 +33,11 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-troque-em-produção"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",") if os.environ.get("ALLOWED_HOSTS") else []
+ALLOWED_HOSTS = (
+    os.environ.get("ALLOWED_HOSTS", "").split(",")
+    if os.environ.get("ALLOWED_HOSTS")
+    else []
+)
 
 
 # Application definition
@@ -48,6 +52,7 @@ INSTALLED_APPS = [
     "usuarios",
     "financas",
     "movimentacoes",
+    "dashboard",
 ]
 
 MIDDLEWARE = [
@@ -100,7 +105,7 @@ AUTHENTICATION_BACKENDS = [
     "usuarios.backends.UsuarioBackend",
 ]
 
-LOGIN_URL = "usuarios:usuario_login"
+LOGIN_URL = "usuarios:usuario-login"
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
