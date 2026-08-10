@@ -17,6 +17,7 @@ from django.views.generic import (
 )
 
 from core.utils import _somar_meses
+from financas.models import CartaoCredito, Categoria, Conta
 
 from . import forms
 from .models import AnexoMovimentacao, Movimentacao, Transferencia
@@ -29,12 +30,41 @@ class MovimentacaoListView(LoginRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        return (
+        qs = (
             super().get_queryset()
             .filter(usuario=self.request.user)
             .select_related("conta", "categoria", "forma_pagamento", "centro_custo", "cartao")
             .order_by("-data_vencimento")
         )
+        params = self.request.GET
+        if q := params.get("q"):
+            qs = qs.filter(descricao__icontains=q)
+        if tipo := params.get("tipo"):
+            qs = qs.filter(tipo=tipo)
+        if status := params.get("status"):
+            qs = qs.filter(status=status)
+        if conta_id := params.get("conta"):
+            qs = qs.filter(conta_id=conta_id)
+        if cat_id := params.get("categoria"):
+            qs = qs.filter(categoria_id=cat_id)
+        if mes := params.get("mes"):
+            ano, mes_num = mes.split("-")
+            qs = qs.filter(data_movimentacao__year=ano, data_movimentacao__month=mes_num)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        movs = Movimentacao.objects.filter(usuario=user)
+        meses = (
+            movs.dates("data_movimentacao", "month")
+            .order_by("-data_movimentacao")
+            .values_list("data_movimentacao", flat=True)[:12]
+        )
+        context["meses"] = [d.strftime("%Y-%m") for d in meses]
+        context["contas_filter"] = Conta.objects.filter(usuario=user, ativa=True)
+        context["categorias_filter"] = Categoria.objects.filter(usuario=user, ativa=True)
+        return context
 
 
 class MovimentacaoCreateView(LoginRequiredMixin, CreateView):

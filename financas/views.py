@@ -52,6 +52,11 @@ class FinancasContaDetailView(LoginRequiredMixin, DetailView):
     def get_queryset(self):
         return super().get_queryset().filter(usuario=self.request.user)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["saldo_atual"] = self.object.get_saldo_atual()
+        return context
+
 
 class FinancasDesativarContaView(LoginRequiredMixin, View):
     template_name = "conta_desativar.html"

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load finance_filters %}
 
 {% block title %}{{ conta.nome }}{% endblock %}
 
@@ -23,8 +24,15 @@
 
 <div class="row justify-content-center">
     <div class="col-lg-6">
-        <div class="card">
+        <div class="card shadow-sm border-0 mb-3">
             <div class="card-body p-4">
+                <div class="text-center mb-3">
+                    <h6 class="text-muted mb-1">Saldo Atual</h6>
+                    <h3 class="fw-bold {% if saldo_atual >= 0 %}text-success{% else %}text-danger{% endif %}">
+                        {{ saldo_atual|brl }}
+                    </h3>
+                </div>
+                <hr>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span class="text-muted">Tipo</span>
@@ -32,7 +40,7 @@
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span class="text-muted">Saldo Inicial</span>
-                        <strong>R$ {{ conta.saldo_inicial }}</strong>
+                        <strong>{{ conta.saldo_inicial|brl }}</strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span class="text-muted">Status</span>

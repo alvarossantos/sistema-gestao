@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load finance_filters %}
 
 {% block title %}Movimentações{% endblock %}
 
@@ -21,6 +22,60 @@
     </div>
 </div>
 
+{# Filtros #}
+<div class="card shadow-sm border-0 mb-3">
+    <div class="card-body py-2">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-auto">
+                <input type="text" name="q" class="form-control form-control-sm" placeholder="Buscar descrição..." value="{{ request.GET.q|default:'' }}">
+            </div>
+            <div class="col-auto">
+                <select name="mes" class="form-select form-select-sm">
+                    <option value="">Mês</option>
+                    {% for m in meses %}
+                        <option value="{{ m }}" {% if request.GET.mes == m %}selected{% endif %}>{{ m }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-auto">
+                <select name="tipo" class="form-select form-select-sm">
+                    <option value="">Tipo</option>
+                    <option value="RECEITA" {% if request.GET.tipo == 'RECEITA' %}selected{% endif %}>Receita</option>
+                    <option value="DESPESA" {% if request.GET.tipo == 'DESPESA' %}selected{% endif %}>Despesa</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <select name="status" class="form-select form-select-sm">
+                    <option value="">Status</option>
+                    <option value="PENDENTE" {% if request.GET.status == 'PENDENTE' %}selected{% endif %}>Pendente</option>
+                    <option value="PAGO" {% if request.GET.status == 'PAGO' %}selected{% endif %}>Pago</option>
+                    <option value="CANCELADO" {% if request.GET.status == 'CANCELADO' %}selected{% endif %}>Cancelado</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <select name="conta" class="form-select form-select-sm">
+                    <option value="">Conta</option>
+                    {% for c in contas_filter %}
+                        <option value="{{ c.pk }}" {% if request.GET.conta == c.pk|stringformat:"d" %}selected{% endif %}>{{ c.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-auto">
+                <select name="categoria" class="form-select form-select-sm">
+                    <option value="">Categoria</option>
+                    {% for cat in categorias_filter %}
+                        <option value="{{ cat.pk }}" {% if request.GET.categoria == cat.pk|stringformat:"d" %}selected{% endif %}>{{ cat.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-search me-1"></i>Filtrar</button>
+                <a href="{% url 'movimentacoes:listarmovimentacao' %}" class="btn btn-sm btn-outline-secondary">Limpar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
 {% if movimentacoes %}
 <div class="table-wrapper">
     <div class="table-responsive">
@@ -33,13 +88,14 @@
                     <th>Status</th>
                     <th class="hide-sm">Conta</th>
                     <th class="hide-sm">Categoria</th>
-                    <th class="hide-sm">Data</th>
+                    <th class="hide-sm">Vencimento</th>
                     <th class="text-end">Ações</th>
                 </tr>
             </thead>
             <tbody>
                 {% for mov in movimentacoes %}
-                <tr>
+                {% now "Y-m-d" as today %}
+                <tr class="{% if mov.status == 'PENDENTE' and mov.data_vencimento|date:'Y-m-d' < today %}table-danger{% endif %}">
                     <td class="fw-semibold">{{ mov.descricao }}</td>
                     <td>
                         {% if mov.tipo == 'RECEITA' %}
@@ -49,20 +105,30 @@
                         {% endif %}
                     </td>
                     <td class="fw-semibold {% if mov.tipo == 'RECEITA' %}text-success{% else %}text-danger{% endif %}">
-                        {% if mov.tipo == 'RECEITA' %}+{% else %}-{% endif %} R$ {{ mov.valor }}
+                        {% if mov.tipo == 'RECEITA' %}+{% else %}-{% endif %} {{ mov.valor|brl }}
                     </td>
                     <td>
                         {% if mov.status == 'PAGO' %}
                             <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Pago</span>
                         {% elif mov.status == 'PENDENTE' %}
-                            <span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i>Pendente</span>
+                            {% if mov.data_vencimento|date:'Y-m-d' < today %}
+                                <span class="badge bg-danger"><i class="bi bi-exclamation-triangle me-1"></i>Em atraso</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i>Pendente</span>
+                            {% endif %}
                         {% else %}
                             <span class="badge bg-secondary"><i class="bi bi-x-circle me-1"></i>Cancelado</span>
                         {% endif %}
                     </td>
                     <td class="hide-sm">{{ mov.conta }}</td>
-                    <td class="hide-sm">{{ mov.categoria }}</td>
-                    <td class="hide-sm">{{ mov.data_movimentacao|date:"d/m/Y" }}</td>
+                    <td class="hide-sm">
+                        {% if mov.categoria.cor %}
+                            <span class="badge border" style="background-color: {{ mov.categoria.cor }}; color: #fff;">{{ mov.categoria }}</span>
+                        {% else %}
+                            {{ mov.categoria }}
+                        {% endif %}
+                    </td>
+                    <td class="hide-sm">{{ mov.data_vencimento|date:"d/m/Y" }}</td>
                     <td>
                         <div class="table-actions justify-content-end">
                             {% if mov.status == 'PENDENTE' %}
@@ -82,10 +148,11 @@
         </table>
     </div>
 </div>
+{% include "includes/pagination.html" %}
 {% else %}
 <div class="alert alert-info d-flex align-items-center gap-2">
     <i class="bi bi-info-circle"></i>
-    <div>Nenhuma movimentação cadastrada. <a href="{% url 'movimentacoes:movimentacao-nova' %}" class="fw-semibold">Crie a primeira!</a></div>
+    <div>Nenhuma movimentação encontrada. <a href="{% url 'movimentacoes:movimentacao-nova' %}" class="fw-semibold">Crie a primeira!</a></div>
 </div>
 {% endif %}
 {% endblock %}

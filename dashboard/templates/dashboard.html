@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load finance_filters %}
 
 {% block title %}Dashboard - Sistema Gestão{% endblock %}
 
@@ -11,7 +12,7 @@
             <div class="card-body text-center">
                 <h6 class="text-muted">Saldo Total</h6>
                 <h3 class="fw-bold {% if saldo_total >= 0 %}text-success{% else %}text-danger{% endif %}">
-                    R$ {{ saldo_total|floatformat:2 }}
+                    {{ saldo_total|brl }}
                 </h3>
             </div>
         </div>
@@ -20,7 +21,7 @@
         <div class="card shadow-sm border-0">
             <div class="card-body text-center">
                 <h6 class="text-muted">Receitas do Mês</h6>
-                <h3 class="fw-bold text-success">R$ {{ receitas_mes|floatformat:2 }}</h3>
+                <h3 class="fw-bold text-success">{{ receitas_mes|brl }}</h3>
             </div>
         </div>
     </div>
@@ -28,7 +29,7 @@
         <div class="card shadow-sm border-0">
             <div class="card-body text-center">
                 <h6 class="text-muted">Despesas do Mês</h6>
-                <h3 class="fw-bold text-danger">R$ {{ despesas_mes|floatformat:2 }}</h3>
+                <h3 class="fw-bold text-danger">{{ despesas_mes|brl }}</h3>
             </div>
         </div>
     </div>
@@ -51,12 +52,19 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% now "Y-m-d" as today %}
                     {% for mov in proximos_vencimentos %}
-                    <tr>
+                    <tr class="{% if mov.data_vencimento|date:'Y-m-d' < today %}table-danger{% endif %}">
                         <td>{{ mov.descricao }}</td>
-                        <td class="fw-semibold">R$ {{ mov.valor|floatformat:2 }}</td>
+                        <td class="fw-semibold">{{ mov.valor|brl }}</td>
                         <td>{{ mov.data_vencimento|date:"d/m/Y" }}</td>
-                        <td><span class="badge bg-warning text-dark">{{ mov.get_status_display }}</span></td>
+                        <td>
+                            {% if mov.data_vencimento|date:'Y-m-d' < today %}
+                                <span class="badge bg-danger"><i class="bi bi-exclamation-triangle me-1"></i>Em atraso</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">{{ mov.get_status_display }}</span>
+                            {% endif %}
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -85,7 +93,7 @@
                     {% for fatura in faturas %}
                     <tr>
                         <td>{{ fatura.cartao.nome }}</td>
-                        <td class="fw-semibold">R$ {{ fatura.valor|floatformat:2 }}</td>
+                        <td class="fw-semibold">{{ fatura.valor|brl }}</td>
                         <td>{{ fatura.vencimento.0|date:"d/m" }} - {{ fatura.vencimento.2|date:"d/m/Y" }}</td>
                     </tr>
                     {% endfor %}
