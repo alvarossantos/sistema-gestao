@@ -116,26 +116,41 @@ class MovimentacaoForm(forms.ModelForm):
                 "O vencimento não pode ser antes da data da movimentação.",
             )
 
-        # Regra: se informou cartão, categoria deve ser do mesmo tipo
+        # Regras de negócio do cartão e categoria
         cartao = cleaned_data.get("cartao")
         categoria = cleaned_data.get("categoria")
         tipo = cleaned_data.get("tipo")
+        forma_pagamento = cleaned_data.get("forma_pagamento")
 
-        if cartao and categoria and tipo:
-            if categoria.tipo != tipo:
-                self.add_error(
-                    "categoria",
-                    f"A categoria '{categoria.nome}' é do tipo '{categoria.get_tipo_display()}', "
-                    f"mas a movimentação é do tipo '{tipo}'. Escolha uma categoria compatível.",
-                )
+        # Categoria sempre deve bater com o tipo da movimentação
+        if categoria and tipo and categoria.tipo != tipo:
+            self.add_error(
+                "categoria",
+                f"Categoria incompatível com o tipo '{tipo}'.",
+            )
 
-        # Se informou cartão, forma_pagamento deve ser "Cartão de Crédito" (auto-preenche)
-        if cartao:
-            try:
-                forma_cartao = financas_models.FormaPagamento.objects.get(nome__iexact="Cartão de Crédito")
-                cleaned_data["forma_pagamento"] = forma_cartao
-            except financas_models.FormaPagamento.DoesNotExist:
-                pass  # Se não existir, deixa o usuário escolher manualmente
+        # Receita não pode ser no cartão de crédito
+        if cartao and tipo == "RECEITA":
+            self.add_error(
+                "cartao",
+                "Receita não pode ser lançada no cartão de crédito.",
+            )
+
+        # Cartão <-> Forma de Pagamento: nas duas direções
+        if cartao and (not forma_pagamento or forma_pagamento.nome.lower() != "cartão de crédito"):
+            self.add_error(
+                "forma_pagamento",
+                "Selecione 'Cartão de Crédito' como forma de pagamento.",
+            )
+        if (
+            forma_pagamento
+            and forma_pagamento.nome.lower() == "cartão de crédito"
+            and not cartao
+        ):
+            self.add_error(
+                "cartao",
+                "Selecione o cartão usado nesta compra.",
+            )
 
         return cleaned_data
 

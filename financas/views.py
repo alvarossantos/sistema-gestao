@@ -1,6 +1,9 @@
+from decimal import Decimal
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
+from django.db.models import Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.urls.base import reverse_lazy
@@ -306,35 +309,55 @@ class FinancasCartaoCreditoDetailView(LoginRequiredMixin, DetailView):
 
 
 class PagarFaturaView(LoginRequiredMixin, View):
-    """Paga a fatura do cartão criando uma movimentação de despesa na conta de pagamento."""
+    """Paga a fatura do cartão: marca compras do período como pagas e
+    cria um débito na conta bancária de pagamento."""
 
     def post(self, request, *args, **kwargs):
         cartao = get_object_or_404(
             models.CartaoCredito, pk=kwargs["pk"], usuario=request.user
         )
 
-        valor_fatura = cartao.get_valor_fatura_digital()
+        inicio, fechamento, _ = cartao.get_periodo_fatura_atual()
+
+        from movimentacoes.models import Movimentacao
+
+        # Compras do período que serão marcadas como pagas
+        compras = Movimentacao.objects.filter(
+            cartao=cartao,
+            tipo="DESPESA",
+            data_movimentacao__gte=inicio,
+            data_movimentacao__lte=fechamento,
+        ).exclude(status="CANCELADO")
+
+        valor_fatura = compras.aggregate(total=Sum("valor"))["total"] or Decimal("0")
         if valor_fatura <= 0:
             messages.warning(request, "Não há fatura a pagar para este cartão.")
             return redirect("financas:cartao-detalhe", pk=cartao.pk)
 
-        from movimentacoes.models import Movimentacao
+        # Busca ou cria a categoria fixa "Pagamento de Fatura"
+        categoria, _ = models.Categoria.objects.get_or_create(
+            usuario=request.user,
+            nome="Pagamento de Fatura",
+            tipo="DESPESA",
+            defaults={"cor": "#6c757d", "ativa": True},
+        )
 
         with transaction.atomic():
-            # Cria a movimentação de pagamento da fatura
+            # 1) Marca todas as compras do período como pagas
+            compras.update(status="PAGO", data_pagamento=timezone.localdate())
+
+            # 2) Cria o débito na conta bancária (SEM cartao=, pois não é compra no cartão)
             Movimentacao.objects.create(
                 usuario=request.user,
                 conta=cartao.conta_pagamento,
-                categoria=models.Categoria.objects.filter(
-                    usuario=request.user, tipo="DESPESA"
-                ).first(),  # Usa a primeira categoria de despesa disponível
+                categoria=categoria,
                 descricao=f"Pagamento fatura {cartao.nome}",
                 valor=valor_fatura,
                 tipo="DESPESA",
                 status="PAGO",
                 data_movimentacao=timezone.localdate(),
                 data_vencimento=timezone.localdate(),
-                cartao=cartao,
+                cartao=None,  # débito na conta, não compra no cartão
                 observacao=f"Pagamento automático da fatura do cartão {cartao.nome}",
             )
 
