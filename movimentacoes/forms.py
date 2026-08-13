@@ -116,6 +116,27 @@ class MovimentacaoForm(forms.ModelForm):
                 "O vencimento não pode ser antes da data da movimentação.",
             )
 
+        # Regra: se informou cartão, categoria deve ser do mesmo tipo
+        cartao = cleaned_data.get("cartao")
+        categoria = cleaned_data.get("categoria")
+        tipo = cleaned_data.get("tipo")
+
+        if cartao and categoria and tipo:
+            if categoria.tipo != tipo:
+                self.add_error(
+                    "categoria",
+                    f"A categoria '{categoria.nome}' é do tipo '{categoria.get_tipo_display()}', "
+                    f"mas a movimentação é do tipo '{tipo}'. Escolha uma categoria compatível.",
+                )
+
+        # Se informou cartão, forma_pagamento deve ser "Cartão de Crédito" (auto-preenche)
+        if cartao:
+            try:
+                forma_cartao = financas_models.FormaPagamento.objects.get(nome__iexact="Cartão de Crédito")
+                cleaned_data["forma_pagamento"] = forma_cartao
+            except financas_models.FormaPagamento.DoesNotExist:
+                pass  # Se não existir, deixa o usuário escolher manualmente
+
         return cleaned_data
 
 
@@ -147,17 +168,30 @@ class TransferenciaForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        origem = cleaned_data.get("conta_origem")
-        destino = cleaned_data.get("conta_destino")
-        if origem and destino and origem == destino:
-            self.add_error(
-                "conta_destino",
-                "Conta de destino não pode ser a mesma que a conta de origem.",
-            )
-
+        conta_origem = cleaned_data.get("conta_origem")
         valor = cleaned_data.get("valor")
+
+        if conta_origem and valor:
+            # Calcula o saldo atual da conta de origem
+            saldo_atual = conta_origem.get_saldo_atual()
+
+            # Se estiver editando, devolve o valor original ao saldo antes de subtrair
+            if self.instance.pk:
+                saldo_atual += self.instance.valor
+
+            if saldo_atual < valor:
+                self.add_error(
+                    "valor",
+                    f"Saldo insuficiente. Saldo disponível: R$ {saldo_atual:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."),
+                )
+
         if valor is not None and valor <= 0:
             self.add_error("valor", "O valor deve ser maior que zero.")
+
+        # Conta origem e destino devem ser diferentes
+        conta_destino = cleaned_data.get("conta_destino")
+        if conta_origem and conta_destino and conta_origem == conta_destino:
+            self.add_error("conta_destino", "A conta de destino deve ser diferente da conta de origem.")
 
         return cleaned_data
 

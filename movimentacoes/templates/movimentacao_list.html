@@ -77,6 +77,42 @@
 </div>
 
 {% if movimentacoes %}
+{# Totais #}
+<div class="row g-2 mb-3">
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center py-2">
+                <small class="text-muted d-block">Total Receitas</small>
+                <strong class="text-success">{{ total_receitas|brl }}</strong>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center py-2">
+                <small class="text-muted d-block">Total Despesas</small>
+                <strong class="text-danger">{{ total_despesas|brl }}</strong>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center py-2">
+                <small class="text-muted d-block">Saldo</small>
+                <strong class="{% if saldo_filtro >= 0 %}text-success{% else %}text-danger{% endif %}">{{ saldo_filtro|brl }}</strong>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center py-2">
+                <small class="text-muted d-block">Total Filtrado</small>
+                <strong>{{ paginator.count }} registro{{ paginator.count|pluralize }}</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="table-wrapper">
     <div class="table-responsive">
         <table class="table table-hover align-middle">
@@ -94,8 +130,7 @@
             </thead>
             <tbody>
                 {% for mov in movimentacoes %}
-                {% now "Y-m-d" as today %}
-                <tr class="{% if mov.status == 'PENDENTE' and mov.data_vencimento|date:'Y-m-d' < today %}table-danger{% endif %}">
+                <tr class="{% if mov.esta_em_atraso %}table-danger{% endif %}">
                     <td class="fw-semibold">{{ mov.descricao }}</td>
                     <td>
                         {% if mov.tipo == 'RECEITA' %}
@@ -111,7 +146,7 @@
                         {% if mov.status == 'PAGO' %}
                             <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Pago</span>
                         {% elif mov.status == 'PENDENTE' %}
-                            {% if mov.data_vencimento|date:'Y-m-d' < today %}
+                            {% if mov.esta_em_atraso %}
                                 <span class="badge bg-danger"><i class="bi bi-exclamation-triangle me-1"></i>Em atraso</span>
                             {% else %}
                                 <span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i>Pendente</span>
@@ -139,7 +174,12 @@
                             {% endif %}
                             <a href="{% url 'movimentacoes:movimentacao-detalhe' mov.pk %}" class="btn btn-sm btn-outline-primary" title="Ver"><i class="bi bi-eye"></i></a>
                             <a href="{% url 'movimentacoes:movimentacao-editar' mov.pk %}" class="btn btn-sm btn-outline-warning" title="Editar"><i class="bi bi-pencil"></i></a>
-                            <a href="{% url 'movimentacoes:movimentacao-excluir' mov.pk %}" class="btn btn-sm btn-outline-danger" title="Excluir"><i class="bi bi-trash"></i></a>
+                            <button type="button" class="btn btn-sm btn-outline-danger" title="Excluir"
+                                    data-bs-toggle="modal" data-bs-target="#modalExcluir"
+                                    data-id="{{ mov.pk }}" data-nome="{{ mov.descricao }}"
+                                    data-url="{% url 'movimentacoes:movimentacao-excluir' mov.pk %}">
+                                <i class="bi bi-trash"></i>
+                            </button>
                         </div>
                     </td>
                 </tr>
@@ -149,6 +189,42 @@
     </div>
 </div>
 {% include "includes/pagination.html" %}
+
+{# Modal de exclusão #}
+<div class="modal fade" id="modalExcluir" tabindex="-1" aria-labelledby="modalExcluirLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="modalExcluirLabel"><i class="bi bi-trash me-2 text-danger"></i>Excluir Movimentação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                Tem certeza que deseja excluir a movimentação <strong id="modalExcluirNome"></strong>?
+                <br><small class="text-muted">Esta ação não pode ser desfeita.</small>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button>
+                <a id="modalExcluirLink" href="#" class="btn btn-danger"><i class="bi bi-trash me-1"></i> Excluir</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var modal = document.getElementById('modalExcluir');
+    modal.addEventListener('show.bs.modal', function(event) {
+        var button = event.relatedTarget;
+        var nome = button.getAttribute('data-nome');
+        var url = button.getAttribute('data-url');
+        document.getElementById('modalExcluirNome').textContent = nome;
+        document.getElementById('modalExcluirLink').href = url;
+    });
+});
+</script>
+{% endblock %}
+
 {% else %}
 <div class="alert alert-info d-flex align-items-center gap-2">
     <i class="bi bi-info-circle"></i>

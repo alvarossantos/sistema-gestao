@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load finance_filters %}
 
 {% block title %}{{ cartao_credito.nome }}{% endblock %}
 
@@ -22,9 +23,54 @@
 </div>
 
 <div class="row justify-content-center">
-    <div class="col-lg-6">
-        <div class="card">
+    <div class="col-lg-8">
+        {# Alerta de limite #}
+        {% if alerta_limite %}
+        <div class="alert alert-danger d-flex gap-2 mb-3">
+            <i class="bi bi-exclamation-triangle fs-4"></i>
+            <div>
+                <strong>Atenção!</strong> Você já utilizou {{ percentual_uso|floatformat:0 }}% do limite do cartão.
+                {% if percentual_uso >= 100 %}
+                    <br><small>O limite foi ultrapassado!</small>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        {# Card principal #}
+        <div class="card shadow-sm border-0 mb-3">
             <div class="card-body p-4">
+                <div class="row text-center mb-3">
+                    <div class="col-md-4">
+                        <h6 class="text-muted">Limite</h6>
+                        <h4 class="fw-bold">{{ cartao_credito.limite|brl }}</h4>
+                    </div>
+                    <div class="col-md-4">
+                        <h6 class="text-muted">Fatura Atual</h6>
+                        <h4 class="fw-bold text-danger">{{ valor_fatura|brl }}</h4>
+                    </div>
+                    <div class="col-md-4">
+                        <h6 class="text-muted">Disponível</h6>
+                        <h4 class="fw-bold {% if limite_disponivel >= 0 %}text-success{% else %}text-danger{% endif %}">
+                            {{ limite_disponivel|brl }}
+                        </h4>
+                    </div>
+                </div>
+
+                {# Barra de progresso do limite #}
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <small class="text-muted">Uso do limite</small>
+                        <small class="text-muted">{{ percentual_uso|floatformat:1 }}%</small>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar {% if percentual_uso >= 80 %}bg-danger{% elif percentual_uso >= 50 %}bg-warning{% else %}bg-success{% endif %}"
+                             style="width: {{ percentual_uso|floatformat:1 }}%"></div>
+                    </div>
+                </div>
+
+                <hr>
+
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span class="text-muted">Nome</span>
@@ -32,7 +78,7 @@
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span class="text-muted">Limite</span>
-                        <strong>R$ {{ cartao_credito.limite }}</strong>
+                        <strong>{{ cartao_credito.limite|brl }}</strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span class="text-muted">Dia de Fechamento</span>
@@ -46,9 +92,68 @@
                         <span class="text-muted">Conta de Pagamento</span>
                         <strong>{{ cartao_credito.conta_pagamento }}</strong>
                     </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Próximo Vencimento</span>
+                        <strong>{{ periodo_vencimento|date:"d/m/Y" }}</strong>
+                    </li>
                 </ul>
             </div>
+
+            {% if valor_fatura > 0 %}
+            <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                <small class="text-muted">
+                    <i class="bi bi-calendar me-1"></i>
+                    Período: {{ periodo_inicio|date:"d/m" }} — {{ periodo_fechamento|date:"d/m/Y" }}
+                </small>
+                <form method="post" action="{% url 'financas:cartao-pagar-fatura' cartao_credito.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success btn-sm"
+                            onclick="return confirm('Confirma pagamento da fatura de {{ valor_fatura|brl }}?')">
+                        <i class="bi bi-check-circle me-1"></i> Pagar Fatura
+                    </button>
+                </form>
+            </div>
+            {% endif %}
         </div>
+
+        {# Movimentações da fatura #}
+        {% if movimentacoes_fatura %}
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white">
+                <h6 class="mb-0"><i class="bi bi-list-ul me-2"></i>Movimentações desta Fatura</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Descrição</th>
+                                <th>Categoria</th>
+                                <th>Valor</th>
+                                <th>Data</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for mov in movimentacoes_fatura %}
+                            <tr>
+                                <td>{{ mov.descricao }}</td>
+                                <td>
+                                    {% if mov.categoria.cor %}
+                                        <span class="badge" style="background-color: {{ mov.categoria.cor }}; color: #fff;">{{ mov.categoria }}</span>
+                                    {% else %}
+                                        {{ mov.categoria }}
+                                    {% endif %}
+                                </td>
+                                <td class="fw-semibold text-danger">{{ mov.valor|brl }}</td>
+                                <td>{{ mov.data_movimentacao|date:"d/m/Y" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

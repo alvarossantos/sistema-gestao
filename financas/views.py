@@ -1,6 +1,8 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect, render
+from django.db import transaction
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.urls.base import reverse_lazy
 from django.views import View
 from django.views.generic import (
@@ -21,6 +23,14 @@ class FinancasContaListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return super().get_queryset().filter(usuario=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        contas_ativas = models.Conta.objects.filter(usuario=user, ativa=True)
+        context["contas_ativas"] = contas_ativas.count()
+        context["saldo_geral"] = sum(c.get_saldo_atual() for c in contas_ativas)
+        return context
 
 
 class FinancasContaCreateView(LoginRequiredMixin, CreateView):
@@ -87,7 +97,7 @@ class FinancasCategoriaListView(LoginRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        return super().get_queryset().filter(usuario=self.request.user)
+        return super().get_queryset().filter(usuario=self.request.user).order_by("tipo", "nome")
 
 
 class FinancasCategoriaCreateView(LoginRequiredMixin, CreateView):
@@ -164,7 +174,7 @@ class FinancasCentroCustoListView(LoginRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        return super().get_queryset().filter(usuario=self.request.user)
+        return super().get_queryset().filter(usuario=self.request.user).order_by("nome")
 
 
 class FinancasCentroCustoCreateView(LoginRequiredMixin, CreateView):
@@ -232,7 +242,7 @@ class FinancasCartaoCreditoListView(LoginRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        return super().get_queryset().filter(usuario=self.request.user)
+        return super().get_queryset().filter(usuario=self.request.user).select_related("conta_pagamento").order_by("nome")
 
 
 class FinancasCartaoCreditoCreateView(LoginRequiredMixin, CreateView):
@@ -268,12 +278,82 @@ class FinancasCartaoCreditoDetailView(LoginRequiredMixin, DetailView):
     def get_queryset(self):
         return super().get_queryset().filter(usuario=self.request.user)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        cartao = self.object
+        inicio, fechamento, vencimento = cartao.get_periodo_fatura_atual()
+        valor_fatura = cartao.get_valor_fatura_digital()
+        limite_usado = cartao.limite - valor_fatura if valor_fatura else cartao.limite
+        percentual_uso = (valor_fatura / cartao.limite * 100) if cartao.limite and valor_fatura else 0
+
+        from movimentacoes.models import Movimentacao
+        movimentacoes_fatura = Movimentacao.objects.filter(
+            cartao=cartao,
+            tipo="DESPESA",
+            data_movimentacao__gte=inicio,
+            data_movimentacao__lte=fechamento,
+        ).exclude(status="CANCELADO").select_related("categoria").order_by("-data_movimentacao")
+
+        context["valor_fatura"] = valor_fatura
+        context["periodo_inicio"] = inicio
+        context["periodo_fechamento"] = fechamento
+        context["periodo_vencimento"] = vencimento
+        context["limite_disponivel"] = limite_usado
+        context["percentual_uso"] = percentual_uso
+        context["movimentacoes_fatura"] = movimentacoes_fatura
+        context["alerta_limite"] = percentual_uso >= 80
+        return context
+
+
+class PagarFaturaView(LoginRequiredMixin, View):
+    """Paga a fatura do cartão criando uma movimentação de despesa na conta de pagamento."""
+
+    def post(self, request, *args, **kwargs):
+        cartao = get_object_or_404(
+            models.CartaoCredito, pk=kwargs["pk"], usuario=request.user
+        )
+
+        valor_fatura = cartao.get_valor_fatura_digital()
+        if valor_fatura <= 0:
+            messages.warning(request, "Não há fatura a pagar para este cartão.")
+            return redirect("financas:cartao-detalhe", pk=cartao.pk)
+
+        from movimentacoes.models import Movimentacao
+
+        with transaction.atomic():
+            # Cria a movimentação de pagamento da fatura
+            Movimentacao.objects.create(
+                usuario=request.user,
+                conta=cartao.conta_pagamento,
+                categoria=models.Categoria.objects.filter(
+                    usuario=request.user, tipo="DESPESA"
+                ).first(),  # Usa a primeira categoria de despesa disponível
+                descricao=f"Pagamento fatura {cartao.nome}",
+                valor=valor_fatura,
+                tipo="DESPESA",
+                status="PAGO",
+                data_movimentacao=timezone.localdate(),
+                data_vencimento=timezone.localdate(),
+                cartao=cartao,
+                observacao=f"Pagamento automático da fatura do cartão {cartao.nome}",
+            )
+
+        messages.success(
+            request,
+            f"Fatura de R$ {valor_fatura:,.2f} paga com sucesso! "
+            f"Valor debitado de '{cartao.conta_pagamento}'.",
+        )
+        return redirect("financas:cartao-detalhe", pk=cartao.pk)
+
 
 class FinancasFormaPagamentoListView(LoginRequiredMixin, ListView):
     model = models.FormaPagamento
     template_name = "forma_list.html"
     context_object_name = "forma_pagamento"
     paginate_by = 20
+
+    def get_queryset(self):
+        return super().get_queryset().order_by("nome")
 
 
 class FinancasFormaPagamentoCreateView(LoginRequiredMixin, CreateView):

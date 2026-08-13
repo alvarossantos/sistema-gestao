@@ -398,3 +398,33 @@ main {
     display: none !important;
   }
 }
+
+/* ---------- Botão flutuante (FAB) ---------- */
+.fab-nova-movimentacao {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.5);
+  z-index: 1050;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-decoration: none;
+}
+
+.fab-nova-movimentacao:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 28px rgba(79, 70, 229, 0.6);
+  color: #fff;
+}
+
+.fab-nova-movimentacao:active {
+  transform: scale(0.95);
+}

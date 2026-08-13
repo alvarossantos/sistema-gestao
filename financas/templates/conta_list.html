@@ -17,6 +17,37 @@
     </a>
 </div>
 
+{% if saldo_geral is not None %}
+<div class="row g-2 mb-3">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center py-2">
+                <small class="text-muted d-block">Saldo Total</small>
+                <strong class="{% if saldo_geral >= 0 %}text-success{% else %}text-danger{% endif %}">
+                    {{ saldo_geral|brl }}
+                </strong>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center py-2">
+                <small class="text-muted d-block">Contas Ativas</small>
+                <strong>{{ contas_ativas }}</strong>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center py-2">
+                <small class="text-muted d-block">Total de Contas</small>
+                <strong>{{ paginator.count }}</strong>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 {% if contas %}
 <div class="table-wrapper">
     <div class="table-responsive">
@@ -26,6 +57,7 @@
                     <th>Nome</th>
                     <th>Tipo</th>
                     <th class="hide-sm">Saldo Inicial</th>
+                    <th class="hide-sm">Saldo Atual</th>
                     <th>Status</th>
                     <th class="text-end">Ações</th>
                 </tr>
@@ -36,6 +68,13 @@
                     <td class="fw-semibold">{{ conta.nome }}</td>
                     <td>{{ conta.get_tipo_display }}</td>
                     <td class="hide-sm">{{ conta.saldo_inicial|brl }}</td>
+                    <td class="hide-sm">
+                        {% with saldo=conta.get_saldo_atual %}
+                        <span class="{% if saldo >= 0 %}text-success{% else %}text-danger{% endif %} fw-semibold">
+                            {{ saldo|brl }}
+                        </span>
+                        {% endwith %}
+                    </td>
                     <td>
                         {% if conta.ativa %}
                             <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Ativa</span>

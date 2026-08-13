@@ -94,6 +94,21 @@ class CategoriaForm(forms.ModelForm):
             if self.instance.pk:
                 field.queryset = field.queryset.exclude(pk=self.instance.pk)
 
+    def clean(self):
+        cleaned_data = super().clean()
+        categoria_pai = cleaned_data.get("categoria_pai")
+        tipo = cleaned_data.get("tipo")
+
+        if categoria_pai and tipo:
+            if categoria_pai.tipo != tipo:
+                self.add_error(
+                    "categoria_pai",
+                    f"A categoria pai '{categoria_pai.nome}' é do tipo "
+                    f"'{categoria_pai.get_tipo_display()}', mas esta categoria é do tipo '{tipo}'. "
+                    f"Escolha uma categoria pai do mesmo tipo.",
+                )
+        return cleaned_data
+
 
 class CentroCustoForm(forms.ModelForm):
     class Meta:

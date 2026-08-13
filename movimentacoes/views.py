@@ -64,6 +64,18 @@ class MovimentacaoListView(LoginRequiredMixin, ListView):
         context["meses"] = [d.strftime("%Y-%m") for d in meses]
         context["contas_filter"] = Conta.objects.filter(usuario=user, ativa=True)
         context["categorias_filter"] = Categoria.objects.filter(usuario=user, ativa=True)
+
+        # Totais filtrados
+        qs_filtrado = self.get_queryset()
+        from django.db.models import Sum, Q
+        totais = qs_filtrado.aggregate(
+            total_receitas=Sum("valor", filter__tipo="RECEITA"),
+            total_despesas=Sum("valor", filter__tipo="DESPESA"),
+        )
+        context["total_receitas"] = totais["total_receitas"] or 0
+        context["total_despesas"] = totais["total_despesas"] or 0
+        context["saldo_filtro"] = (totais["total_receitas"] or 0) - (totais["total_despesas"] or 0)
+
         return context
 
 
@@ -151,6 +163,25 @@ class MovimentacaoDeleteView(LoginRequiredMixin, DeleteView):
     def get_queryset(self):
         return super().get_queryset().filter(usuario=self.request.user)
 
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        excluir_parcelas = request.POST.get("excluir_parcelas")
+
+        if excluir_parcelas == "on" and self.object.grupo_parcela:
+            Movimentacao.objects.filter(
+                grupo_parcela=self.object.grupo_parcela,
+                usuario=request.user,
+            ).delete()
+            messages.success(
+                request,
+                f"Parcelamento excluído com sucesso ({self.object.total_parcelas} parcelas removidas).",
+            )
+        else:
+            self.object.delete()
+            messages.success(request, "Movimentação excluída com sucesso.")
+
+        return HttpResponseRedirect(self.get_success_url())
+
 
 class MovimentacaoDetailView(LoginRequiredMixin, DetailView):
     model = Movimentacao
@@ -180,7 +211,9 @@ class TransferenciaListView(LoginRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        return super().get_queryset().filter(usuario=self.request.user)
+        return super().get_queryset().filter(
+            usuario=self.request.user
+        ).select_related("conta_origem", "conta_destino").order_by("-data")
 
 
 class TransferenciaCreateView(LoginRequiredMixin, CreateView):
@@ -239,7 +272,9 @@ class AnexoMovimentacaoListView(LoginRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        return super().get_queryset().filter(movimentacao__usuario=self.request.user)
+        return super().get_queryset().filter(
+            movimentacao__usuario=self.request.user
+        ).select_related("movimentacao").order_by("-enviado_em")
 
 
 class AnexoMovimentacaoCreateView(LoginRequiredMixin, CreateView):

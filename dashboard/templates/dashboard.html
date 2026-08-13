@@ -35,6 +35,34 @@
     </div>
 </div>
 
+{# Gráficos #}
+<div class="row g-3 mb-4">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white">
+                <h6 class="mb-0"><i class="bi bi-graph-up me-2"></i>Receitas vs Despesas (últimos 6 meses)</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="chartReceitasDespesas" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white">
+                <h6 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Top Categorias (Despesas)</h6>
+            </div>
+            <div class="card-body">
+                {% if chart_categorias_labels != '[]' %}
+                <canvas id="chartCategorias" height="200"></canvas>
+                {% else %}
+                <p class="text-muted text-center mt-4">Sem dados de despesas no mês.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
 {% if proximos_vencimentos %}
 <div class="card shadow-sm border-0 mb-4">
     <div class="card-header bg-white">
@@ -52,14 +80,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% now "Y-m-d" as today %}
                     {% for mov in proximos_vencimentos %}
-                    <tr class="{% if mov.data_vencimento|date:'Y-m-d' < today %}table-danger{% endif %}">
+                    <tr class="{% if mov.esta_em_atraso %}table-danger{% endif %}">
                         <td>{{ mov.descricao }}</td>
                         <td class="fw-semibold">{{ mov.valor|brl }}</td>
                         <td>{{ mov.data_vencimento|date:"d/m/Y" }}</td>
                         <td>
-                            {% if mov.data_vencimento|date:'Y-m-d' < today %}
+                            {% if mov.esta_em_atraso %}
                                 <span class="badge bg-danger"><i class="bi bi-exclamation-triangle me-1"></i>Em atraso</span>
                             {% else %}
                                 <span class="badge bg-warning text-dark">{{ mov.get_status_display }}</span>
@@ -103,4 +130,107 @@
     </div>
 </div>
 {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gráfico de barras: Receitas vs Despesas
+    var labels = {{ chart_labels|safe }};
+    var receitas = {{ chart_receitas|safe }};
+    var despesas = {{ chart_despesas|safe }};
+
+    // Formatar labels para exibição (MM/AAAA)
+    var labelsFormatados = labels.map(function(l) {
+        var partes = l.split('-');
+        return partes[1] + '/' + partes[0];
+    });
+
+    var ctxBar = document.getElementById('chartReceitasDespesas');
+    if (ctxBar) {
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: labelsFormatados,
+                datasets: [
+                    {
+                        label: 'Receitas',
+                        data: receitas,
+                        backgroundColor: 'rgba(34, 197, 94, 0.7)',
+                        borderColor: 'rgba(34, 197, 94, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                    },
+                    {
+                        label: 'Despesas',
+                        data: despesas,
+                        backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                        borderColor: 'rgba(239, 68, 68, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                return ctx.dataset.label + ': R$ ' + ctx.raw.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(val) { return 'R$ ' + val.toLocaleString('pt-BR'); }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Gráfico de pizza: Top categorias
+    var catLabels = {{ chart_categorias_labels|safe }};
+    var catValores = {{ chart_categorias_valores|safe }};
+    var catCores = {{ chart_categorias_cores|safe }};
+
+    var ctxPie = document.getElementById('chartCategorias');
+    if (ctxPie && catLabels.length > 0) {
+        new Chart(ctxPie, {
+            type: 'doughnut',
+            data: {
+                labels: catLabels,
+                datasets: [{
+                    data: catValores,
+                    backgroundColor: catCores,
+                    borderWidth: 2,
+                    borderColor: '#fff',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { padding: 12 } },
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                return ctx.label + ': R$ ' + ctx.raw.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

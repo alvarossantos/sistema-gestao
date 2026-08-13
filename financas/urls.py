@@ -31,6 +31,7 @@ urlpatterns = [
     path("cartao/nova/", views.FinancasCartaoCreditoCreateView.as_view(), name="cartao-nova"),
     path("cartao/<int:pk>/", views.FinancasCartaoCreditoDetailView.as_view(), name="cartao-detalhe"),
     path("cartao/<int:pk>/editar/", views.FinancasCartaoCreditoUpdateView.as_view(), name="cartao-editar"),
+    path("cartao/<int:pk>/pagar-fatura/", views.PagarFaturaView.as_view(), name="cartao-pagar-fatura"),
 
     # Formas de Pagamento
     path("forma/", views.FinancasFormaPagamentoListView.as_view(), name="forma-listar"),

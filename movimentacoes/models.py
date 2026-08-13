@@ -1,6 +1,7 @@
 from typing import ClassVar
 
 from django.db import models
+from django.utils import timezone
 
 
 class Movimentacao(models.Model):
@@ -57,6 +58,18 @@ class Movimentacao(models.Model):
 
     def __str__(self):
         return str(self.descricao)
+
+    @property
+    def esta_em_atraso(self):
+        """Retorna True se a movimentação está pendente e passou da data de vencimento."""
+        return self.status == "PENDENTE" and self.data_vencimento < timezone.localdate()
+
+    @property
+    def total_grupo_parcela(self):
+        """Retorna o total de parcelas do grupo, se aplicável."""
+        if not self.grupo_parcela:
+            return 0
+        return Movimentacao.objects.filter(grupo_parcela=self.grupo_parcela).count()
 
 
 class Transferencia(models.Model):
